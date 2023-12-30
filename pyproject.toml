@@ -3,13 +3,14 @@ requires = ['setuptools>=60.2.0', 'setuptools-scm', "mypy"]
 build-backend = 'setuptools.build_meta'
 
 [project]
-name = "bacore"
+name = 'bacore'
 version = "0.0.4"
-description = "Bacore is a framework for business analysis and test automation."
+description = "BACore is a framework for business analysis and test automation."
 readme = "README.md"
 authors = [
     { name = "Kristian Grönberg", email = "kristian@gronberg.org" }
 ]
+
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -19,23 +20,22 @@ classifiers = [
     "Framework :: Pydantic :: 2",
     "Framework :: Pytest",
     "Intended Audience :: Developers",
-    "Natural Language :: English"
+    "Natural Language :: English" ]
+keywords = ["business analysis", "test automation", "testing"
 ]
-keywords = ["business analysis", "test automation", "testing"]
-
 requires-python = ">=3.12.0"
 dependencies = [
-    "pydantic>=2.5.2",
+    "pydantic>=2.5.2"
 ]
 
 [project.optional-dependencies]
 
 build = [
     "build>=1.0.3",
-    "twine>=4.0.2"
-]
+    "twine>=4.0.2" ]
 
 cli = [
+    "hatch",
     "typer[all]>=0.4.0"
 ]
 
@@ -73,5 +73,5 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 addopts = [
-    "--import-mode=importlib",
+    "--import-mode=importlib"
 ]
