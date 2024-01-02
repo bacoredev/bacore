@@ -10,7 +10,6 @@ readme = "README.md"
 authors = [
     { name = "Kristian Grönberg", email = "kristian@gronberg.org" }
 ]
-
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
