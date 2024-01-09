@@ -6,17 +6,6 @@ from pydantic.dataclasses import dataclass
 
 
 @dataclass
-class System:
-    """System configurations.
-
-    Attributes:
-        os: The operating system.
-    """
-
-    os = platform.system()
-
-
-@dataclass
 class Project:
     """Project configurations.
 
@@ -34,4 +23,24 @@ class Project:
         """Validate that the name does not contain spaces."""
         if " " in v:
             raise ValueError("No spaces allowed in project name.")
+        return v
+
+
+@dataclass
+class System:
+    """System configurations.
+
+    Attributes:
+        os: The operating system.
+    """
+
+    os: str = platform.system()
+
+    @field_validator("os")
+    @classmethod
+    def os_must_be_supported(cls, v: str) -> str:
+        """Validate that the operating system is supported."""
+        supported_oses = ["Darwin", "Linux", "Windows"]
+        if v not in supported_oses:
+            raise ValueError(f"Operating system '{v}' is not supported.")
         return v

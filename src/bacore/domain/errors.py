@@ -3,12 +3,12 @@ from pydantic import ValidationError
 
 
 class PydValErrInfo:
-    """Information from pydantic ValidationError."""
+    """Extract information from pydantic ValidationError."""
 
     @staticmethod
     def error_msg(e: ValidationError) -> str:
         """Error message from pydantic ValidationError."""
-        return repr(e.errors()[0]["ctx"]["error"]).split("'")[1]  # TODO: Fix to handle "'" in error message.
+        return e.errors()[0]["ctx"]["error"]
 
     @staticmethod
     def input(e: ValidationError) -> str:
