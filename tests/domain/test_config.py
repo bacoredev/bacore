@@ -23,11 +23,11 @@ class TestSystem:
     """Tests for System entity."""
 
     def test_os(self):
-        """Test os."""
+        """Test os. (Darwin is macOS.)"""
         os = config.System.os
         assert os in ["Darwin", "Linux", "Windows"]
 
     def test_os_must_be_supported(self):
         """Test os_must_be_supported."""
         with pytest.raises(ValueError):
-            config.System(os="MacOS")
+            config.System(os="AS/400")

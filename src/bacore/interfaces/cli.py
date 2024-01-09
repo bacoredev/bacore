@@ -1,4 +1,4 @@
-"""BACore CLI interface."""
+"""CLI interface."""
 from bacore.interactors.install import command_on_path
 from rich import print
 from typer import Exit

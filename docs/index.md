@@ -22,4 +22,4 @@ To use BACore on the command line install with: `pip install bacore[cli]`.
 Once you have installed BACore, then you can create a new project with: `bacore create project <project_name>`.
 
 Most of the underlying functionality is available through the CLI. BACore CLI is reusing functionality from other
-project such as [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch).
+projects such as [Hatch](https://github.com/pypa/hatch).
