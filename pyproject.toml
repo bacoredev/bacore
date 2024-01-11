@@ -9,7 +9,8 @@ description = "BACore is a framework for business analysis and test automation."
 readme = "README.md"
 authors = [
     { name = "Kristian Grönberg", email = "kristian@gronberg.org" },
-    { name = "Jacob Dahlberg", email = "dahlberg.jacob@gmail.com"}]
+    { name = "Jacob Dahlberg", email = "dahlberg.jacob@gmail.com"},
+    { name = "Jonatan Söderström", email = "jonatan.m.soderstrom@gmail.com"}]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
