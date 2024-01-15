@@ -2,7 +2,7 @@
 import subprocess as sup
 from bacore.domain.config import Project
 from bacore.domain.errors import PydValErrInfo
-from bacore.interfaces.cli import verify_programs_installed
+from bacore.interfaces import cli_typer
 from pydantic import ValidationError
 from rich import print
 from typer import Argument, Exit, Option, Typer, prompt
@@ -15,7 +15,7 @@ app = Typer(rich_markup_mode="rich")
 def documentation(project: Annotated[str, Argument(help="Name of project.")] = '',
                   port: Annotated[int, Option(help="Port to serve documentation on.")] = 8000):
     """Serve documentation with MkDocs for a project."""
-    verify_programs_installed(['mkdocs'])
+    cli_typer.verify_programs_installed(['mkdocs'])
 
     if project == '':
         project = prompt("Enter project name")
@@ -27,6 +27,4 @@ def documentation(project: Annotated[str, Argument(help="Name of project.")] = '
         raise Exit()
 
     print(f'Serving documentation for project "{project.name}"[white]...[/]')
-    sup.run(f"cd {project.root_path} && mkdocs serve -a 127.0.0.1:{port} &", shell=True)
-    sup.run(f'cd {project} && mkdocs serve', shell=True)
-
+    sup.run(f"mkdocs serve -a 127.0.0.1:{port} &", shell=True)

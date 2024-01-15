@@ -2,7 +2,7 @@
 import subprocess as sup
 from bacore.domain.config import Project
 from bacore.domain.errors import PydValErrInfo
-from bacore.interfaces import cli
+from bacore.interfaces import cli_typer
 from pydantic import ValidationError
 from rich import print
 from typer import Argument, Exit, Typer, prompt
@@ -14,7 +14,7 @@ app = Typer(rich_markup_mode="rich")
 @app.command(rich_help_panel="Create")
 def project(name: Annotated[str, Argument(help="Name of project ([red]no spaces allowed[/]).")] = ''):
     """Create new project ([blue]with hatch[/])."""
-    cli.verify_programs_installed(['hatch'])
+    cli_typer.verify_programs_installed(['hatch'])
 
     if name == '':
         name = prompt("Enter project name")
