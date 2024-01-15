@@ -19,15 +19,15 @@ class TestProject:
             config.Project(name="ba core")
 
 
-class TestSystem:
-    """Tests for System entity."""
+class TestSystemInfo:
+    """Test for SystemInfo."""
 
     def test_os(self):
         """Test os. (Darwin is macOS.)"""
-        os = config.System.os
-        assert os in ["Darwin", "Linux", "Windows"]
+        system_info = config.SystemInfo(os="Darwin")
+        assert system_info.os in ["Darwin", "Linux", "Windows"]
 
     def test_os_must_be_supported(self):
         """Test os_must_be_supported."""
         with pytest.raises(ValueError):
-            config.System(os="AS/400")
+            config.SystemInfo(os="AS/400")

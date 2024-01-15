@@ -1,29 +1,10 @@
 """Retrieve Functionality Module (the "get" word feels overloaded)."""
-import tomllib
+import platform
 from bacore.domain import config
-from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 
-def project_information(pyproject_file: Path) -> config.Project:
-    """Get project information."""
-    info = toml_file_content(pyproject_file)
-    project_info = config.Project(name=info["project"]["name"],
-                                  version=info["project"]["version"],
-                                  description=info["project"]["description"])
-    return project_info
-
-
-def toml_file_content(file: Path) -> dict:
-    """Get project information."""
-    try:
-        with open(file, mode="rb") as f:
-            content = tomllib.load(f)
-        return content
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File '{file}' not found.")
-
-
+@runtime_checkable
 class SupportsRetrieveDict(Protocol):
     """Protocol for retrieval of file content as dict."""
 
@@ -32,14 +13,12 @@ class SupportsRetrieveDict(Protocol):
         ...
 
 
-class File:
-    """File retrival."""
+def file_as_dict(file: SupportsRetrieveDict) -> dict:
+    """Content as dictionary."""
+    return file.data_to_dict()
 
-    def __init__(self, name: SupportsRetrieveDict):
-        """Initialize."""
-        self.file = name
 
-    @property
-    def as_dict(self):
-        """Content as dictionary."""
-        return self.file.data_to_dict()
+def system_information(func: callable = platform.system()) -> config.SystemInfo:
+    """Retrieve system information."""
+    info = config.SystemInfo(os=func)
+    return info

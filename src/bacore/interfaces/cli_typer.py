@@ -1,24 +1,40 @@
 """CLI created with Typer."""
-from bacore.interactors import install, retrieve
+from bacore.domain import files, system
+from bacore.interactors import retrieve, verify
 from rich import print
 from typer import Exit
-from typing import Protocol
 
 
-class File(Protocol):
-    """File protocol."""
+class ProjectInfo:
+    """Project information."""
 
-    def read_content(self) -> dict:
-        """Read name content."""
-        ...
+    def __init__(self, project_file: files.TOML):
+        """Initialize."""
+        self._project_file = project_file
+        self._project_info = retrieve.file_as_dict(file=self._project_file)
+
+    @property
+    def name(self) -> str:
+        """Project name."""
+        return self._project_info["project"]["name"]
+
+    @property
+    def version(self) -> str:
+        """Project version."""
+        return self._project_info["project"]["version"]
+
+    @property
+    def description(self) -> str:
+        """Project description."""
+        return self._project_info["project"]["description"]
 
 
-def verify_programs_installed(list_of_programs: list[str]):
-    """Check if a list of programs are installed."""
+def verify_programs_installed(list_of_programs: list[system.CommandLineProgram]):
+    """Check if a list of command line programs are installed."""
     programs_not_installed = 0
 
     for program in list_of_programs:
-        if install.command_on_path(program) is False:
+        if verify.command_on_path(program) is False:
             programs_not_installed += 1
             print(f'{program} is [red]not installed[/]. Install with: [blue]pip install bacore\\[cli\\][/]')
 

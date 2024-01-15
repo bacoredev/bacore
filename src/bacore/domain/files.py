@@ -1,4 +1,4 @@
-"""Handling of files and directories."""
+"""Module domain files for handling of files and directories."""
 import tomllib
 from pathlib import Path
 
@@ -21,11 +21,6 @@ class TOML:
         if not isinstance(value, Path):
             raise TypeError("Path must be a pathlib.Path object.")
         self._path = value
-
-    @property
-    def absolute_path(self):
-        """Absolute path."""
-        return self.path.absolute()
 
     def data_to_dict(self) -> dict:
         """Content as dictionary."""
