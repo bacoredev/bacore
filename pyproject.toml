@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'bacore'
-version = "0.0.7"
+version = "0.0.8"
 description = "BACore is a framework for business analysis and test automation."
 readme = "README.md"
 authors = [
@@ -55,7 +55,9 @@ docs = [
 	"mkdocs-caption>=0.0.10",
 	"mkdocs-material>=9.4.14",
 	"mkdocstrings>=0.24.0",
-	"mkdocstrings-python>=1.7.5" ]
+	"mkdocstrings-python>=1.7.5",
+    "mkdocs-git-show-history-log-plugin>=0.2",
+    "neoteroi-mkdocs>=1.0.4" ]
 
 jupyter = [
     "jupyterlab>=4.0.9",

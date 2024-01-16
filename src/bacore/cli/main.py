@@ -5,7 +5,7 @@ from bacore.interfaces import cli_typer
 from typer import Typer
 
 pyproject_file = files.TOML(path=files.Path("pyproject.toml"))
-project_info = cli_typer.ProjectInfo(project_file=pyproject_file)
+project_info = cli_typer.ProjectInfo(pyproject_file=pyproject_file)
 
 app = Typer(rich_markup_mode="rich", add_completion=False)
 app.add_typer(create.app, name="create", help="Create a project")

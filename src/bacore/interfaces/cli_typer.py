@@ -2,16 +2,17 @@
 from bacore.domain import files, system
 from bacore.interactors import retrieve, verify
 from rich import print
+from pathlib import Path
 from typer import Exit
 
 
 class ProjectInfo:
     """Project information."""
 
-    def __init__(self, project_file: files.TOML):
+    def __init__(self, pyproject_file: Path):
         """Initialize."""
-        self._project_file = project_file
-        self._project_info = retrieve.file_as_dict(file=self._project_file)
+        self._pyproject_file_toml_object = files.TOML(path=pyproject_file)
+        self._project_info = retrieve.file_as_dict(file=self._pyproject_file_toml_object)
 
     @property
     def name(self) -> str:
