@@ -5,7 +5,7 @@ from bacore.domain import config
 pytestmark = pytest.mark.domain
 
 
-class TestProject:
+class TestProjectInfo:
     """Tests for ProjectInfo entity."""
 
     def test_name(self):
