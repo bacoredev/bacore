@@ -21,8 +21,8 @@ class Credential(BaseModel):
 
 
 @dataclass
-class Project:
-    """Project configurations."""
+class ProjectInfo:
+    """Project information."""
 
     name: str
     version: Optional[str] = None
@@ -39,7 +39,7 @@ class Project:
 
 @dataclass
 class SystemInfo:
-    """System configurations."""
+    """System information."""
 
     os: str
 

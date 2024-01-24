@@ -1,37 +1,46 @@
 """CLI created with Typer."""
-from bacore.domain import files, system
+from bacore.domain import config, files, system
 from bacore.interactors import retrieve, verify
 from rich import print
 from pathlib import Path
 from typer import Exit
+from typing import Optional
 
 
 class ProjectInfo:
-    """Project information."""
+    """ProjectInfo information."""
 
     def __init__(self, pyproject_file: Path):
         """Initialize."""
         self._pyproject_file_toml_object = files.TOML(path=pyproject_file)
-        self._project_info = retrieve.file_as_dict(file=self._pyproject_file_toml_object)
+        self._project_info_dict = retrieve.file_as_dict(file=self._pyproject_file_toml_object)
+        self._project_info = config.ProjectInfo(name=self._project_info_dict["project"]["name"],
+                                                version=self._project_info_dict["project"]["version"],
+                                                description=self._project_info_dict["project"]["description"]
+                                                )
 
     @property
     def name(self) -> str:
-        """Project name."""
-        return self._project_info["project"]["name"]
+        """ProjectInfo name."""
+        return self._project_info.name
 
     @property
-    def version(self) -> str:
-        """Project version."""
-        return self._project_info["project"]["version"]
+    def version(self) -> Optional[str]:
+        """ProjectInfo version."""
+        return self._project_info.version
 
     @property
-    def description(self) -> str:
-        """Project description."""
-        return self._project_info["project"]["description"]
+    def description(self) -> Optional[str]:
+        """ProjectInfo description."""
+        return self._project_info.description
 
 
 def verify_programs_installed(list_of_programs: list[system.CommandLineProgram]):
-    """Check if a list of command line programs are installed."""
+    """Check if a list of command line programs are installed.
+
+    TODO: This function does not follow the overall design of the project. -> Move to an interactor module.
+
+    """
     programs_not_installed = 0
 
     for program in list_of_programs:

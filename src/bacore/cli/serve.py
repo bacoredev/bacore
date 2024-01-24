@@ -1,6 +1,6 @@
 """Serve CLI module."""
 import subprocess as sup
-from bacore.domain.config import Project
+from bacore.domain.config import ProjectInfo
 from bacore.domain.errors import PydValErrInfo
 from bacore.interfaces import cli_typer
 from pydantic import ValidationError
@@ -21,7 +21,7 @@ def documentation(project: Annotated[str, Argument(help="Name of project.")] = '
         project = prompt("Enter project name")
 
     try:
-        project = Project(name=project)
+        project = ProjectInfo(name=project)
     except ValidationError as e:
         print(f'[red]{PydValErrInfo.error_msg(e)}[/red] Input was: "{PydValErrInfo.input(e)}"')
         raise Exit()

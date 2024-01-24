@@ -6,17 +6,17 @@ pytestmark = pytest.mark.domain
 
 
 class TestProject:
-    """Tests for Project entity."""
+    """Tests for ProjectInfo entity."""
 
     def test_name(self):
         """Test name."""
-        p = config.Project(name="bacore")
+        p = config.ProjectInfo(name="bacore")
         assert p.name == "bacore"
 
     def test_name_must_not_contain_spaces(self):
         """Test name_must_not_contain_spaces."""
         with pytest.raises(ValueError):
-            config.Project(name="ba core")
+            config.ProjectInfo(name="ba core")
 
 
 class TestSystemInfo:
