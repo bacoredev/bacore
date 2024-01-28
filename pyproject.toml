@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'bacore'
-version = "0.0.9"
+version = "0.0.10"
 description = "BACore is a framework for business analysis and test automation."
 readme = "README.md"
 authors = [
@@ -24,7 +24,8 @@ classifiers = [
 keywords = ["business analysis", "test automation", "testing" ]
 requires-python = ">=3.12.0"
 dependencies = [
-    "pydantic>=2.5.2" ]
+    "pydantic>=2.5.2",
+    "pydantic-settings>=2.1.0" ]
 
 [project.optional-dependencies]
 
@@ -43,25 +44,25 @@ cli = [
 
 dev = [
     "bpython>=0.24",
-	"pdbpp>=0.10.3",
-	"pytest-memray>=1.5.0",
-	"pytest-testmon>=2.1.0",
-	"pytest-watch>=4.2.0"
+        "pdbpp>=0.10.3",
+        "pytest-memray>=1.5.0",
+        "pytest-testmon>=2.1.0",
+        "pytest-watch>=4.2.0"
 ]
 
 docs = [
     "markdown-exec[ansi]>=1.7.0",
-	"mkdocs>=1.5.3",
-	"mkdocs-caption>=0.0.10",
-	"mkdocs-material>=9.4.14",
-	"mkdocstrings>=0.24.0",
-	"mkdocstrings-python>=1.7.5",
+        "mkdocs>=1.5.3",
+        "mkdocs-caption>=0.0.10",
+        "mkdocs-material>=9.4.14",
+        "mkdocstrings>=0.24.0",
+        "mkdocstrings-python>=1.7.5",
     "mkdocs-git-show-history-log-plugin>=0.2",
     "neoteroi-mkdocs>=1.0.4" ]
 
 jupyter = [
     "jupyterlab>=4.0.9",
-	"jupyter-collaboration>=2.0.0",
+        "jupyter-collaboration>=2.0.0",
     "python-language-server[all]>=0.36.2"
 ]
 

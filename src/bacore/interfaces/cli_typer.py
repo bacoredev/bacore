@@ -1,5 +1,5 @@
 """CLI created with Typer."""
-from bacore.domain import config, files, system
+from bacore.domain import info, files, system
 from bacore.interactors import retrieve, verify
 from rich import print
 from pathlib import Path
@@ -14,10 +14,10 @@ class ProjectInfo:
         """Initialize."""
         self._pyproject_file_toml_object = files.TOML(path=pyproject_file)
         self._project_info_dict = retrieve.file_as_dict(file=self._pyproject_file_toml_object)
-        self._project_info = config.ProjectInfo(name=self._project_info_dict["project"]["name"],
-                                                version=self._project_info_dict["project"]["version"],
-                                                description=self._project_info_dict["project"]["description"]
-                                                )
+        self._project_info = info.Project(name=self._project_info_dict["project"]["name"],
+                                          version=self._project_info_dict["project"]["version"],
+                                          description=self._project_info_dict["project"]["description"]
+                                          )
 
     @property
     def name(self) -> str:

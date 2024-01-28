@@ -1,27 +1,11 @@
-"""Configuration for the domain layer."""
-from pydantic import BaseModel, SecretStr, field_validator
+"""Config module for user specified settings and configurations."""
+from pydantic import field_validator
 from pydantic.dataclasses import dataclass
 from typing import Optional
 
 
 @dataclass
-class Credential(BaseModel):
-    """Credential details."""
-
-    username: str
-    password: SecretStr
-
-    @field_validator("username")
-    @classmethod
-    def username_must_not_contain_spaces(cls, v: str) -> str:
-        """Validate that the username does not contain spaces."""
-        if " " in v:
-            raise ValueError("No spaces allowed in username.")
-        return v
-
-
-@dataclass
-class ProjectInfo:
+class Project:
     """Project information."""
 
     name: str
@@ -38,7 +22,7 @@ class ProjectInfo:
 
 
 @dataclass
-class SystemInfo:
+class System:
     """System information."""
 
     os: str
