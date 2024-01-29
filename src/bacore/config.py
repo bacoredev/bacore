@@ -1,7 +1,7 @@
 """Configuration module for BACore."""
 
-from bacore.domain import info
+from bacore.domain import settings
 
-project_bacore = info.Project(name="BACore",
-                              version="0.0.10",
-                              description="BACore is a framework for business analysis and test automation.")
+project_bacore = settings.Project(name="BACore",
+                                  version="0.0.10",
+                                  description="BACore is a framework for business analysis and test automation.")

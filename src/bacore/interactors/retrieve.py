@@ -1,6 +1,6 @@
 """Retrieve Functionality Module (the "get" word feels overloaded)."""
 import platform
-from bacore.domain import info
+from bacore.domain import settings
 from typing import Protocol, runtime_checkable
 
 
@@ -18,7 +18,7 @@ def file_as_dict(file: SupportsRetrieveDict) -> dict:
     return file.data_to_dict()
 
 
-def system_information(func: callable = platform.system()) -> info.System:
+def system_information(func: callable = platform.system()) -> settings.System:
     """Retrieve system information."""
-    information = info.System(os=func)
+    information = settings.System(os=func)
     return information
