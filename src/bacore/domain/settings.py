@@ -1,4 +1,5 @@
 """Settings module for settings of BACore and its components."""
+import platform
 from bacore.domain import files
 from pathlib import Path
 from pydantic import Field, computed_field, field_validator, SecretStr
@@ -107,6 +108,22 @@ class System:
         if v not in supported_oses:
             raise ValueError(f"Operating system '{v}' is not supported.")
         return v
+
+
+class SystemSettings(BaseSettings):
+    """System settings."""
+
+    @computed_field
+    @property
+    def _system_info(self) -> System:
+        """System information."""
+        info = System(os=platform.system())
+        return info
+
+    @property
+    def os(self) -> str:
+        """Operating system."""
+        return self._system_info.os
 
 
 class Token(BaseSettings):

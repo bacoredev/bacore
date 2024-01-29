@@ -9,7 +9,7 @@ pytestmark = pytest.mark.interactors
 @pytest.fixture
 def fixture_test_command_on_path():
     """Fixture for command_on_path."""
-    if retrieve.system_information().os in ["Darwin", "Linux"]:
+    if retrieve.system_information_os().os in ["Darwin", "Linux"]:
         return "ls"
     else:
         return "dir"

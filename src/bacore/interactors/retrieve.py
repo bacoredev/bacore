@@ -18,7 +18,7 @@ def file_as_dict(file: SupportsRetrieveDict) -> dict:
     return file.data_to_dict()
 
 
-def system_information(func: callable = platform.system()) -> settings.System:
+def system_information_os(func: callable = platform.system()) -> settings.System:
     """Retrieve system information."""
     information = settings.System(os=func)
     return information
