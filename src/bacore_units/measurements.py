@@ -23,11 +23,11 @@ class Time:
     """Class for time related settings."""
 
     now = datetime.now()
-    now_string = now.strftime("%Y-%m-%d %H:%M:%S")
+    now_s = now.strftime("%Y-%m-%d %H:%M:%S")
     today = date.today()
-    today_string = today.strftime("%Y-%m-%d")
+    today_s = today.strftime("%Y-%m-%d")
     yesterday = today - timedelta(days=1)
-    yesterday_string = yesterday.strftime("%Y-%m-%d")
+    yesterday_s = yesterday.strftime("%Y-%m-%d")
     ty = today.strftime("%Y")
     tm = today.strftime("%m")
     td = today.strftime("%d")
