@@ -10,10 +10,10 @@ def fixture_project_root_dir(fixture_pyproject_file):
     return fixture_pyproject_file.parent
 
 
-class TestCredential:
-    """Tests for Credential entity."""
+class TestCredentials:
+    """Tests for Credentials entity."""
 
-    credential = settings.Credential(username="username", password="passw0rd")
+    credential = settings.Credentials(username="username", password=settings.Secret(secret="passw0rd"))
 
     def test_username(self):
         """Test username."""
@@ -22,15 +22,7 @@ class TestCredential:
     def test_username_must_not_contain_spaces(self):
         """Test username must not contain spaces."""
         with pytest.raises(ValueError):
-            settings.Credential(username="user name")
-
-    def test_password(self):
-        """Test password."""
-        assert self.credential.password.get_secret_value() == "passw0rd"
-
-    def test_password_must_be_secret(self):
-        """Test password must be of type pydantic.SecretStr."""
-        assert isinstance(self.credential.password, settings.SecretStr)
+            settings.Credentials(username="user name", password=settings.Secret(secret="passw0rd"))
 
 
 class TestProject:
@@ -61,6 +53,22 @@ class TestProjectSettings:
         assert project_settings.name == "bacore"
         assert project_settings.version == "1.0.0"
         assert project_settings.description == "BACore is a framework for business analysis and test automation."
+
+
+class TestSecret:
+    """Tests for SecretStr."""
+
+    def test_secret(self):
+        """Test secret."""
+        test_secret = settings.SecretStr("pa$$word")
+        assert test_secret != "pa$$word"
+        assert test_secret.get_secret_value() == "pa$$word"
+
+    def test_secret_input_string(self):
+        """Test secret is coerced to `SecretStr` type."""
+        test_secret = settings.SecretStr("pa$$word")
+        assert isinstance(test_secret, settings.SecretStr)
+        assert test_secret.get_secret_value() == "pa$$word"
 
 
 class TestSystem:

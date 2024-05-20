@@ -2,29 +2,26 @@
 import platform
 from bacore.domain import files
 from pathlib import Path
-from pydantic import Field, computed_field, field_validator, SecretStr
+from pydantic import BaseModel, Field, computed_field, field_validator, SecretStr
 from pydantic_settings import BaseSettings
-from pydantic.dataclasses import dataclass
-from typing import Optional
+from typing import Optional, cast
 
 
-class Credential(BaseSettings):
+class Secret(BaseModel):
     """Credential details."""
 
-    username: str
-    password: SecretStr
+    secret: SecretStr
 
-    @field_validator("username")
+    @field_validator("secret")
     @classmethod
-    def username_must_not_contain_spaces(cls, v: str) -> str:
-        """Validate that the username does not contain spaces."""
-        if " " in v:
-            raise ValueError("No spaces allowed in username.")
+    def coerce_to_secretstr(cls, v: str) -> str:
+        """If a string is given as input, then coerce into secret string (`SecretStr`)."""
+        if type(v) == str:
+            cast(SecretStr, v)
         return v
 
 
-@dataclass
-class Project:
+class Project(BaseModel):
     """Project information."""
 
     name: str
@@ -37,6 +34,36 @@ class Project:
         """Validate that the name does not contain spaces."""
         if " " in v:
             raise ValueError("No spaces allowed in project name.")
+        return v
+
+
+class System(BaseModel):
+    """System information."""
+
+    os: str
+
+    @field_validator("os")
+    @classmethod
+    def os_must_be_supported(cls, v: str) -> str:
+        """Validate that the operating system is supported."""
+        supported_oses = ["Darwin", "Linux", "Windows"]
+        if v not in supported_oses:
+            raise ValueError(f"Operating system '{v}' is not supported.")
+        return v
+
+
+class Credentials(BaseSettings):
+    """Credential details."""
+
+    username: str
+    password: Secret
+
+    @field_validator("username")
+    @classmethod
+    def username_must_not_contain_spaces(cls, v: str) -> str:
+        """Validate that the username does not contain spaces."""
+        if " " in v:
+            raise ValueError("No spaces allowed in username.")
         return v
 
 
@@ -94,22 +121,6 @@ class ProjectSettings(BaseSettings):
         return project_description if project_description is not None else "No project description given."
 
 
-@dataclass
-class System:
-    """System information."""
-
-    os: str
-
-    @field_validator("os")
-    @classmethod
-    def os_must_be_supported(cls, v: str) -> str:
-        """Validate that the operating system is supported."""
-        supported_oses = ["Darwin", "Linux", "Windows"]
-        if v not in supported_oses:
-            raise ValueError(f"Operating system '{v}' is not supported.")
-        return v
-
-
 class SystemSettings(BaseSettings):
     """System settings."""
 
@@ -124,9 +135,3 @@ class SystemSettings(BaseSettings):
     def os(self) -> str:
         """Operating system."""
         return self._system_info.os
-
-
-class Token(BaseSettings):
-    """Credential details."""
-
-    id: SecretStr

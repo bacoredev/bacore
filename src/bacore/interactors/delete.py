@@ -4,20 +4,9 @@ from pathlib import Path
 from pydantic.dataclasses import dataclass
 
 
-def delete_files_old(path: Path, pattern: str, recursive: bool = True):
-    """Delete files."""
-    number_of_deleted_files = 0
-
-    find_function = path.rglob if recursive else path.glob
-    for file in find_function(pattern):
-        if file.is_file():
-            file.unlink()
-            print(f"Deleted file: {file}")
-
-
 @dataclass
 class DeletedFiles:
-    """Deleted files."""
+    """Deleted files summary."""
 
     path: Path
     pattern: str
