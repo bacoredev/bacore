@@ -7,20 +7,6 @@ from pydantic_settings import BaseSettings
 from typing import Optional, cast
 
 
-class Secret(BaseModel):
-    """Credential details."""
-
-    secret: SecretStr
-
-    @field_validator("secret")
-    @classmethod
-    def coerce_to_secretstr(cls, v: str) -> str:
-        """If a string is given as input, then coerce into secret string (`SecretStr`)."""
-        if type(v) == str:
-            cast(SecretStr, v)
-        return v
-
-
 class Project(BaseModel):
     """Project information."""
 
@@ -34,6 +20,20 @@ class Project(BaseModel):
         """Validate that the name does not contain spaces."""
         if " " in v:
             raise ValueError("No spaces allowed in project name.")
+        return v
+
+
+class Secret(BaseModel):
+    """Credential details."""
+
+    secret: SecretStr
+
+    @field_validator("secret")
+    @classmethod
+    def coerce_to_secretstr(cls, v: str) -> str:
+        """If a string is given as input, then coerce into secret string (`SecretStr`)."""
+        if type(v) == str:
+            cast(SecretStr, v)
         return v
 
 

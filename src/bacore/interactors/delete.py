@@ -1,7 +1,9 @@
 """Delete interactors."""
 from datetime import datetime, timedelta
 from pathlib import Path
+from pydantic import Field, validate_call
 from pydantic.dataclasses import dataclass
+from typing_extensions import Annotated
 
 
 @dataclass
@@ -16,7 +18,12 @@ class DeletedFiles:
     deleted_files: list[str]
 
 
-def files(path: Path, pattern: str = "*", older_than_days: int = 0, recursive: bool = False) -> DeletedFiles:
+@validate_call
+def files(path: Path,
+          pattern: str = "*",
+          older_than_days: Annotated[int, Field(ge=0)] = 0,
+          recursive: bool = False
+          ) -> DeletedFiles:
     """Delete files older than x days.
 
     Args:
