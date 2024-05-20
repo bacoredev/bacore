@@ -30,8 +30,8 @@ dependencies = [
 [project.optional-dependencies]
 
 api = [
-    "fastapi[all]>=0.68.1"
-]
+    "fastapi[all]>=0.68.1",
+    "uvicorn>=0.29.0" ]
 
 build = [
     "build>=1.0.3",
@@ -48,8 +48,7 @@ dev = [
     "pytest-memray>=1.5.0",
     "pytest-testmon>=2.1.0",
     "pytest-watch>=4.2.0",
-    "python-language-server[all]>=0.36.2"
-]
+    "python-language-server[all]>=0.36.2" ]
 
 docs = [
     "markdown-exec[ansi]>=1.7.0",
@@ -63,10 +62,10 @@ docs = [
 
 jupyter = [
     "jupyterlab>=4.0.9",
-    "jupyter-collaboration>=2.0.0",
-]
+    "jupyter-collaboration>=2.0.0" ]
 
  test = [
+    "allure-pytest>=2.13.2",
     "lxml>=4.9.4",
     "playwright>=1.40.0",
     "pydantic-xml>=2.7.0",
@@ -77,8 +76,7 @@ jupyter = [
     "pytest-watch>=4.2.0" ]
 
 testreport = [
-    "allure-pytest>=2.13.2"
-]
+    "allure-pytest>=2.13.2" ]
 
 [project.scripts]
 bacore = "bacore.cli.main:app"
@@ -92,4 +90,10 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 addopts = [
-    "--import-mode=importlib" ]
+    "--import-mode=importlib",
+    "--testmon" ]
+markers = [
+    "deve: Tests for setting up local development environment",
+    "domain: Tests for domain",
+    "interactors: Tests for interactors",
+    "interfaces: Tests for interfaces" ]
