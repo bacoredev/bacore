@@ -12,18 +12,19 @@ def create_file(tmp_path):
     return file
 
 
-def test_delete_files(create_file):
-    """Test delete_files."""
-    file = create_file
-    assert file.exists()
-    delete.files(path=file.parent, pattern="*.txt", recursive=False)
-    assert not file.exists()
+class TestFiles:
+
+    def test_delete_files(self, create_file):
+        """Test delete_files."""
+        file = create_file
+        assert file.exists()
+        delete.files(path=file.parent, pattern="*.txt", recursive=False)
+        assert not file.exists()
 
 
-def test_delete_files_with_negative_days(create_file):
-    """Test delete_files with negative days."""
-    file = create_file
-    assert file.exists()
-    with pytest.raises(ValidationError):
-        delete.files(path=file.parent, pattern="*.txt", older_than_days=-1, recursive=False)
-    assert file.exists()
+    def test_delete_files_with_negative_days(self, create_file):
+        """Test delete_files with negative days."""
+        file = create_file
+        with pytest.raises(ValidationError):
+            delete.files(path=file.parent, pattern="*.txt", older_than_days=-1, recursive=False)
+        assert file.exists()

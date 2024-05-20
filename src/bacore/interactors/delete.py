@@ -19,17 +19,14 @@ class DeletedFiles:
 
 
 @validate_call
-def files(path: Path,
-          pattern: str = "*",
-          older_than_days: Annotated[int, Field(ge=0)] = 0,
-          recursive: bool = False
-          ) -> DeletedFiles:
+def files(path: Path, pattern: str = "*", older_than_days: Annotated[int, Field(ge=0)] = 0,
+          recursive: bool = False) -> DeletedFiles:
     """Delete files older than x days.
 
     Args:
       path (`Path`): Path to search for files.
       pattern (`str`): Pattern to search for files.
-      older_than_days (`int`): Delete files older than x dyas. Default is `0`.
+      older_than_days (`int`): Delete files older than x dyas. Default is `0`. Negative values are not allowed.
       recursive (`bool`): Optionally delete files recursively. Default is `False`.
     """
     number_of_deleted_files = 0
