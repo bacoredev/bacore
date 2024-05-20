@@ -1,7 +1,5 @@
 # Overview
-Business Analysis Core (BACore) is framework around a set of tools for common business analysis work. The main focus
-of BACore is on documentation and testing. BACore is written in Python and is available through
-[pypi.org](https://pypi.org/project/bacore/).
+Business Analysis Core (BACore) is framework around a set of tools for common business analysis work. The main focus of BACore is on documentation and testing. BACore is written in Python and is available through [pypi.org](https://pypi.org/project/bacore/) and on [Github](https://github.com/bacoredev/bacore).
 
 !!! note
     
