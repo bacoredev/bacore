@@ -7,6 +7,14 @@ from pydantic_settings import BaseSettings
 from typing import Optional, cast
 
 
+class Keyring(BaseModel):
+    """Key information for keyring secrets in a keychain (MacOS) or key manager (Windows)."""
+
+    service_name: str
+    secret_name: str
+    secret: SecretStr | None = None
+
+
 class Project(BaseModel):
     """Project information."""
 
@@ -30,11 +38,11 @@ class Secret(BaseModel):
 
     @field_validator("secret")
     @classmethod
-    def coerce_to_secretstr(cls, v: str) -> str:
+    def coerce_to_secretstr(cls, v: str) -> SecretStr:
         """If a string is given as input, then coerce into secret string (`SecretStr`)."""
         if type(v) == str:
             cast(SecretStr, v)
-        return v
+        return SecretStr(v)
 
 
 class System(BaseModel):
