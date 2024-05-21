@@ -39,8 +39,9 @@ build = [
 
 cli = [
     "hatch>=1.9.1",
+    "keyring>=24.3.0",
     "Jinja2>=3.1.2",
-    "typer[all]>=0.4.0" ]
+    "typer>=0.8.0" ]
 
 dev = [
     "bpython>=0.24",

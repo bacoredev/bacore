@@ -1,7 +1,6 @@
 """Tests for domain.files module."""
 import pytest
 from bacore.domain import settings
-from pydantic import SecretStr
 
 pytestmark = pytest.mark.domain
 
