@@ -1,6 +1,14 @@
 """Module for domain system."""
 from shutil import which
 
+class CommandNotFound(Exception):
+    """Command not found."""
+
+    def __init__(self, command: str):
+        """Initialize."""
+        self.command = command
+        super().__init__(f"Command '{command}' not found on path.")
+
 
 class CommandLineProgram:
     """Program."""
