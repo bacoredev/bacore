@@ -1,4 +1,5 @@
 """CLI created with Typer."""
+
 from bacore.domain import files, settings, system
 from bacore.interactors import retrieve, verify
 from rich import print
@@ -13,11 +14,14 @@ class ProjectInfo:
     def __init__(self, pyproject_file: Path):
         """Initialize."""
         self._pyproject_file_toml_object = files.TOML(path=pyproject_file)
-        self._project_info_dict = retrieve.file_as_dict(file=self._pyproject_file_toml_object)
-        self._project_info = settings.Project(name=self._project_info_dict["project"]["name"],
-                                          version=self._project_info_dict["project"]["version"],
-                                          description=self._project_info_dict["project"]["description"]
-                                          )
+        self._project_info_dict = retrieve.file_as_dict(
+            file=self._pyproject_file_toml_object
+        )
+        self._project_info = settings.Project(
+            name=self._project_info_dict["project"]["name"],
+            version=self._project_info_dict["project"]["version"],
+            description=self._project_info_dict["project"]["description"],
+        )
 
     @property
     def name(self) -> str:
@@ -46,7 +50,9 @@ def verify_programs_installed(list_of_programs: list[system.CommandLineProgram])
     for program in list_of_programs:
         if verify.command_on_path(program) is False:
             programs_not_installed += 1
-            print(f'{program} is [red]not installed[/]. Install with: [blue]pip install bacore\\[cli\\][/]')
+            print(
+                f"{program} is [red]not installed[/]. Install with: [blue]pip install bacore\\[cli\\][/]"
+            )
 
     if programs_not_installed > 0:
         raise Exit(code=1)

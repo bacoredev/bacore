@@ -1,4 +1,5 @@
 """Tests for domain.files module."""
+
 import pytest
 from bacore.domain import settings
 
@@ -13,7 +14,9 @@ def fixture_project_root_dir(fixture_pyproject_file):
 class TestCredentials:
     """Tests for Credentials entity."""
 
-    credential = settings.Credentials(username="username", password=settings.Secret(secret="passw0rd"))
+    credential = settings.Credentials(
+        username="username", password=settings.Secret(secret="passw0rd")
+    )
 
     def test_username(self):
         """Test username."""
@@ -22,7 +25,9 @@ class TestCredentials:
     def test_username_must_not_contain_spaces(self):
         """Test username must not contain spaces."""
         with pytest.raises(ValueError):
-            settings.Credentials(username="user name", password=settings.Secret(secret="passw0rd"))
+            settings.Credentials(
+                username="user name", password=settings.Secret(secret="passw0rd")
+            )
 
 
 class TestProject:
@@ -45,14 +50,21 @@ class TestProjectSettings:
     def test_path_must_be_directory(self, fixture_project_root_dir):
         """Test path_must_be_directory."""
         with pytest.raises(ValueError):
-            settings.ProjectSettings(project_root_dir=fixture_project_root_dir / "wrong_path")
+            settings.ProjectSettings(
+                project_root_dir=fixture_project_root_dir / "wrong_path"
+            )
 
     def test_project_settings(self, fixture_project_root_dir):
         """Test ProjectSettings."""
-        project_settings = settings.ProjectSettings(project_root_dir=fixture_project_root_dir)
+        project_settings = settings.ProjectSettings(
+            project_root_dir=fixture_project_root_dir
+        )
         assert project_settings.name == "bacore"
         assert project_settings.version == "1.0.0"
-        assert project_settings.description == "BACore is a framework for business analysis and test automation."
+        assert (
+            project_settings.description
+            == "BACore is a framework for business analysis and test automation."
+        )
 
 
 class TestSecret:

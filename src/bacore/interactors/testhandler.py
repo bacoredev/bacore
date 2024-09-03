@@ -1,5 +1,8 @@
 """Testrunner Interactor Module."""
+
+import pytest
 from bacore.domain import settings
+from typing import Optional
 
 
 class TestRunner:
@@ -12,5 +15,3 @@ class TestRunner:
     def run(self):
         """Run tests."""
         print(f"Running tests for project: [blue]{self._project_info.name}[/].")
-
-

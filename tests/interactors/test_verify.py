@@ -1,4 +1,5 @@
 """Tests for interactors.verify module."""
+
 import pytest
 from bacore.domain import system
 from bacore.interactors import retrieve, verify

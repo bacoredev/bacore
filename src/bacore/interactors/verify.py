@@ -1,4 +1,5 @@
 """Module for verification."""
+
 from typing import Protocol
 
 

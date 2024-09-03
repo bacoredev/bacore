@@ -1,4 +1,5 @@
 """Settings module for settings of BACore and its components."""
+
 import platform
 from bacore.domain import files
 from pathlib import Path
@@ -40,7 +41,7 @@ class Secret(BaseModel):
     @classmethod
     def coerce_to_secretstr(cls, v: str) -> SecretStr:
         """If a string is given as input, then coerce into secret string (`SecretStr`)."""
-        if type(v) == str:
+        if isinstance(v, str):
             cast(SecretStr, v)
         return SecretStr(v)
 
@@ -93,7 +94,9 @@ class ProjectSettings(BaseSettings):
     def _pyproject_file(self) -> Path:
         project_file = self.path / "pyproject.toml"
         if project_file.is_file() is False:
-            raise FileNotFoundError(f"Unable to find pyproject.toml file, got '{project_file}'")
+            raise FileNotFoundError(
+                f"Unable to find pyproject.toml file, got '{project_file}'"
+            )
         return project_file
 
     @computed_field
@@ -106,9 +109,11 @@ class ProjectSettings(BaseSettings):
     @property
     def _project_info(self) -> Project:
         """Project information."""
-        info = Project(name=self._project_info_as_dict["project"]["name"],
-                       version=self._project_info_as_dict["project"]["version"],
-                       description=self._project_info_as_dict["project"]["description"])
+        info = Project(
+            name=self._project_info_as_dict["project"]["name"],
+            version=self._project_info_as_dict["project"]["version"],
+            description=self._project_info_as_dict["project"]["description"],
+        )
         return info
 
     @property
@@ -120,13 +125,21 @@ class ProjectSettings(BaseSettings):
     def version(self) -> str:
         """Project name."""
         project_version = self._project_info.version
-        return project_version if project_version is not None else "No project version set."
+        return (
+            project_version
+            if project_version is not None
+            else "No project version set."
+        )
 
     @property
     def description(self) -> str:
         """Project description."""
         project_description = self._project_info.description
-        return project_description if project_description is not None else "No project description given."
+        return (
+            project_description
+            if project_description is not None
+            else "No project description given."
+        )
 
 
 class SystemSettings(BaseSettings):

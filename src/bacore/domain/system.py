@@ -1,5 +1,7 @@
 """Module for domain system."""
+
 from shutil import which
+
 
 class CommandNotFound(Exception):
     """Command not found."""

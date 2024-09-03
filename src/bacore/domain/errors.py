@@ -1,4 +1,5 @@
 """Module for handling exceptions."""
+
 from pydantic import ValidationError
 
 

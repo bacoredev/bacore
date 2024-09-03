@@ -1,4 +1,5 @@
-"""Tests for interactors.retrieve module."""
+"""Tests for cli_typer interface."""
+
 import pytest
 
 pytestmark = pytest.mark.interfaces

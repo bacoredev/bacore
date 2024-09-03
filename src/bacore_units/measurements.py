@@ -1,4 +1,5 @@
 """Measurements module."""
+
 from datetime import date, datetime, timedelta
 from dataclasses import dataclass
 

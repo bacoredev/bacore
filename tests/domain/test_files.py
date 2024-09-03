@@ -1,4 +1,5 @@
 """Tests for domain.files module."""
+
 import pytest
 from bacore.domain import files
 from pathlib import Path
