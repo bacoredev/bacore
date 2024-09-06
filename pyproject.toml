@@ -1,10 +1,9 @@
 [build-system]
-requires = ['setuptools>=60.2.0', 'setuptools-scm', "mypy"]
-build-backend = 'setuptools.build_meta'
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
 
 [project]
 name = 'bacore'
-version = "0.0.23"
 description = "BACore is a framework for business analysis and test automation."
 readme = "README.md"
 authors = [
@@ -21,21 +20,38 @@ classifiers = [
     "Framework :: Pytest",
     "Intended Audience :: Developers",
     "Natural Language :: English" ]
+dynamic = ["version"]
 keywords = ["business analysis", "test automation", "testing" ]
 requires-python = ">=3.11.0"
 dependencies = [
+    "allure-pytest>=2.13.2",
+    "Faker>=25.8.0",
+    "faker_marketdata>=0.4",
+    "hypothesis>=6.103.1",
+    "lxml>=4.9.4",
+    "markdown-exec[ansi]>=1.7.0",
+    "mkdocs>=1.5.3",
+    "mkdocs-caption>=0.0.10",
+    "mkdocs-material>=9.4.14",
+    "mkdocstrings>=0.24.0",
+    "mkdocstrings-python>=1.7.5",
+    "mkdocs-git-show-history-log-plugin>=0.2",
+    "neoteroi-mkdocs>=1.0.4",
+    "playwright>=1.40.0",
+    "polars>=1.4.1",
     "pydantic>=2.5.2",
-    "pydantic-settings>=2.1.0" ]
+    "pydantic-settings>=2.1.0",
+    "pydantic-xml>=2.7.0",
+    "pytest>=7.4.3",
+    "pytest-playwright>=0.4.3",
+    "pytest-testmon>=2.1.0",
+    "pytest-watch>=4.2.0" ]
 
 [project.optional-dependencies]
 
 api = [
     "fastapi[all]>=0.68.1",
     "uvicorn>=0.29.0" ]
-
-build = [
-    "build>=1.0.3",
-    "twine>=4.0.2" ]
 
 cli = [
     "hatch>=1.9.1",
@@ -46,51 +62,20 @@ cli = [
 dev = [
     "bpython>=0.24",
     "pdbpp>=0.10.3",
-    "pytest-testmon>=2.1.0",
-    "pytest-watch>=4.2.0",
     "python-language-server[all]>=0.36.2",
     "ruff>=0.5.2" ]
-
-docs = [
-    "markdown-exec[ansi]>=1.7.0",
-    "mkdocs>=1.5.3",
-    "mkdocs-caption>=0.0.10",
-    "mkdocs-material>=9.4.14",
-    "mkdocstrings>=0.24.0",
-    "mkdocstrings-python>=1.7.5",
-    "mkdocs-git-show-history-log-plugin>=0.2",
-    "neoteroi-mkdocs>=1.0.4" ]
-
-jupyter = [
-    "jupyterlab>=4.0.9",
-    "jupyter-collaboration>=2.0.0" ]
-
-test = [
-    "allure-pytest>=2.13.2",
-    "Faker>=25.8.0",
-    "hypothesis>=6.103.1",
-    "lxml>=4.9.4",
-    "playwright>=1.40.0",
-    "pydantic-xml>=2.7.0",
-    "pytest>=7.4.3",
-    "pytest-playwright>=0.4.3",
-    "pytest-testmon>=2.1.0",
-    "pytest-watch>=4.2.0" ]
-
-testreport = [
-    "allure-pytest>=2.13.2" ]
 
 [project.scripts]
 bacore = "bacore.cli.main:app"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-include-package-data = true
-
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.maturin]
+python-source = "python"
+module-name = "bacore._bacore"
+features = ["pyo3/extension-module"]
+compatibility = "linux"
 
 [tool.pytest.ini_options]
+testpaths = "tests"
 addopts = [
     "--import-mode=importlib",
     "--testmon" ]
@@ -99,3 +84,6 @@ markers = [
     "domain: Tests for domain",
     "interactors: Tests for interactors",
     "interfaces: Tests for interfaces" ]
+
+[tool.ruff]
+line-length = 120
