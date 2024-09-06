@@ -28,6 +28,7 @@ dependencies = [
     "Faker>=25.8.0",
     "faker_marketdata>=0.4",
     "hypothesis>=6.103.1",
+    "keyring>=24.3.0",
     "lxml>=4.9.4",
     "markdown-exec[ansi]>=1.7.0",
     "mkdocs>=1.5.3",
@@ -45,19 +46,14 @@ dependencies = [
     "pytest>=7.4.3",
     "pytest-playwright>=0.4.3",
     "pytest-testmon>=2.1.0",
-    "pytest-watch>=4.2.0" ]
+    "pytest-watch>=4.2.0",
+    "typer>=0.12.5" ]
 
 [project.optional-dependencies]
 
 api = [
     "fastapi[all]>=0.68.1",
     "uvicorn>=0.29.0" ]
-
-cli = [
-    "hatch>=1.9.1",
-    "keyring>=24.3.0",
-    "Jinja2>=3.1.2",
-    "typer>=0.8.0" ]
 
 dev = [
     "bpython>=0.24",
