@@ -1,10 +1,8 @@
 """Set functionality module."""
 
-import keyring
 import subprocess as sup
-from bacore.domain import settings
 from pathlib import Path
-from pydantic import SecretStr, validate_call
+from pydantic import validate_call
 
 
 @validate_call
@@ -27,18 +25,3 @@ def git_repository(
     if rebase:
         sup.run(["git", "-C", repo, "pull", "--rebase"])
     sup.run(["git", "-C", repo, "push", remote, branch])
-
-
-def secret_from_keyring(key: settings.Keyring) -> SecretStr:
-    if key.secret is not None:
-        try:
-            keyring.set_password(
-                service_name=key.service_name,
-                username=key.secret_name,
-                password=key.secret.get_secret_value(),
-            )
-        except Exception as e:
-            raise Exception("Unable to set secret") from e
-    else:
-        raise ValueError("Value must be provided for secret.")
-    return key.secret

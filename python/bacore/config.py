@@ -7,6 +7,6 @@ docker_build = os.getenv("DOCKER_BUILD", None)
 
 project_bacore = settings.Project(
     name="BACore",
-    version="0.0.10",
+    version="0.1.4",
     description="BACore is a framework for business analysis and test automation.",
 )
