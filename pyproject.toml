@@ -24,7 +24,7 @@ dynamic = ["version"]
 keywords = ["business analysis", "test automation", "testing" ]
 requires-python = ">=3.10.0"
 dependencies = [
-    "pydantic>=2.5.2",
+    "pydantic",
     "pydantic-settings>=2.1.0",
     "pytest>=7.4.3",
     "pytest-testmon>=2.1.0",
