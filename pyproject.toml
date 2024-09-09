@@ -22,9 +22,8 @@ classifiers = [
     "Natural Language :: English" ]
 dynamic = ["version"]
 keywords = ["business analysis", "test automation", "testing" ]
-requires-python = ">=3.11.0"
+requires-python = ">=3.10.0"
 dependencies = [
-    "allure-pytest>=2.13.2",
     "Faker>=25.8.0",
     "faker_marketdata>=0.4",
     "hypothesis>=6.103.1",
@@ -73,8 +72,8 @@ compatibility = "linux"
 [tool.pytest.ini_options]
 testpaths = "tests"
 addopts = [
-    "--import-mode=importlib",
-    "--testmon" ]
+    "--import-mode=importlib" ]
+
 markers = [
     "deve: Tests for setting up local development environment",
     "domain: Tests for domain",
