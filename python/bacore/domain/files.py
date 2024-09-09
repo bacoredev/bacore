@@ -2,7 +2,7 @@
 from pathlib import Path
 
 try:
-    import tomllib2
+    import tomllib
 except ImportError:
     import toml as tomllib
 
@@ -28,7 +28,7 @@ class TOML:
 
     def data_to_dict(self) -> dict:
         """Content as dictionary."""
-        with open(self.path, mode="rb") as f:
-            file = f if isinstance(f, str) else f.read()
-            content = tomllib.load(file)
-        return content
+        with open(self.path, mode="rb") as file:
+            file_content = file if isinstance(file, str) else file.read()
+            content_as_dict = tomllib.load(file_content)
+        return content_as_dict
