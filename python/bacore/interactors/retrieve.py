@@ -2,7 +2,6 @@
 
 import platform
 from bacore.domain import settings
-from pydantic import SecretStr
 from typing import Protocol, runtime_checkable
 
 

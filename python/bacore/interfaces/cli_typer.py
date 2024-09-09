@@ -1,10 +1,8 @@
-"""CLI created with Typer."""
+"""CLI Typer interface."""
 
-from bacore.domain import files, settings, system
-from bacore.interactors import retrieve, verify
-from rich import print
+from bacore.domain import files, settings
+from bacore.interactors import retrieve
 from pathlib import Path
-from typer import Exit
 from typing import Optional
 
 
