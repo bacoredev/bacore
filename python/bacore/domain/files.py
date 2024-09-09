@@ -28,7 +28,7 @@ class TOML:
 
     def data_to_dict(self) -> dict:
         """Content as dictionary."""
-        with open(self.path, mode="rb") as file:
+        with open(self.path, mode="r") as file:
             file_content = file if isinstance(file, str) else file.read()
             content_as_dict = tomllib.load(file_content)
         return content_as_dict
