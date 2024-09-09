@@ -1,7 +1,11 @@
 """Module domain files for handling of files and directories."""
 
-import tomllib
 from pathlib import Path
+
+try:
+    import tomllib
+except ImportError:
+    import toml as tomllib
 
 
 class TOML:
