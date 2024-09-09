@@ -30,5 +30,6 @@ class TOML:
     def data_to_dict(self) -> dict:
         """Content as dictionary."""
         with open(self.path, mode="rb") as f:
+            f = f.read()
             content = tomllib.load(f)
         return content
