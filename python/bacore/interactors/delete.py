@@ -1,6 +1,5 @@
 """Delete interactors."""
 
-
 from datetime import datetime, timedelta
 from pathlib import Path
 from pydantic import Field, validate_call
