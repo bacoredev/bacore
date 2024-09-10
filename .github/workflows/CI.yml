@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write  # for PyPI's trusted publishing
 
 jobs:
   linux:
@@ -155,6 +156,7 @@ jobs:
 
   release:
     name: Release
+    environment: release  # for PyPI's trusted publishing
     runs-on: ubuntu-latest
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, musllinux, windows, macos, sdist]
@@ -162,8 +164,8 @@ jobs:
       - uses: actions/download-artifact@v4
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
-        # env:
-        #   MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        env:
+          # MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}  # remove for PyPI's trusted publishing
         with:
           command: upload
           args: --non-interactive --skip-existing wheels-*/*
