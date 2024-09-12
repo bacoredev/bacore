@@ -45,13 +45,13 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --zig
+          args: --release --out dist --zig --compatibility=manylinux2014
           sccache: 'true'
           manylinux: auto
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-manylinux-${{ matrix.platform.target }}
+          name: wheels-linux-${{ matrix.platform.target }}
           path: dist
 
   musllinux:
