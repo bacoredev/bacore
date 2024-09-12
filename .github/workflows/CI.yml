@@ -16,7 +16,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write  # for PyPI's trusted publishing
+  id-token: write
 
 jobs:
   linux:
@@ -45,7 +45,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist
+          args: --release --out dist --zig
           sccache: 'true'
           manylinux: auto
       - name: Upload wheels
