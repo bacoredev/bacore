@@ -4,21 +4,6 @@ from datetime import date, datetime, timedelta
 from dataclasses import dataclass
 
 
-@dataclass
-class Measurement:
-    """Measurements class which contains measurements related settings.
-
-    Attributes:
-        name: The name of the measurement.
-        unit: The unit of the measurement.
-        value: The value of the measurement.
-    """
-
-    name: str
-    unit: str
-    value: float
-
-
 @dataclass(frozen=True)
 class Time:
     """Class for time related settings."""

@@ -10,4 +10,4 @@ def rsync_copy(source: Path, destination: Path, file_filter: Optional[str]):
     try:
         sup.run(f"rsync -av --delete {source}/{file_filter} {destination}", shell=True)
     except FileNotFoundError:
-        print(f"Unable to find source: [pink]{source}[/pink]")
+        raise FileNotFoundError("Unable to find file or directory to copy.")

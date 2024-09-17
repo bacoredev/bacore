@@ -18,7 +18,7 @@ def fixture_test_command_on_path():
 
 def test_command_on_path(fixture_test_command_on_path):
     """Test command_on_path."""
-    command = system.CommandLineProgram(name=fixture_test_command_on_path)
+    command = system.CLIProgram(name=fixture_test_command_on_path)
     assert verify.command_on_path(command=command) is True
-    bogus_command = system.CommandLineProgram(name="bogus_does_not_exist")
+    bogus_command = system.CLIProgram(name="bogus_does_not_exist")
     assert verify.command_on_path(command=bogus_command) is False

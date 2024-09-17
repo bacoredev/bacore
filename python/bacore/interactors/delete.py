@@ -36,10 +36,9 @@ def files(
     """
     number_of_deleted_files = 0
     deleted_files = []
-
     now = datetime.now()
-
     find_function = path.rglob if recursive else path.glob
+
     for file in find_function(pattern):
         if (
             file.is_file()

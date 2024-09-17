@@ -29,7 +29,6 @@ dependencies = [
     "toml>=0.10.2" ]
 
 [project.optional-dependencies]
-
 dev = [
     "bpython>=0.24",
     "pdbpp>=0.10.3",
@@ -47,7 +46,7 @@ bacore = "bacore.cli.main:app"
 python-source = "python"
 module-name = "bacore._bacore"
 features = ["pyo3/extension-module"]
-compatibility = "linux"
+compatibility = "manylinux2014"
 
 [tool.pytest.ini_options]
 testpaths = "tests"
@@ -62,3 +61,7 @@ markers = [
 
 [tool.ruff]
 line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+ignore = []

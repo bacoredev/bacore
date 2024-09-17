@@ -8,14 +8,6 @@ from pydantic_settings import BaseSettings
 from typing import Optional, cast
 
 
-class Keyring(BaseModel):
-    """Key information for keyring secrets in a keychain (MacOS) or key manager (Windows)."""
-
-    service_name: str
-    secret_name: str
-    secret: SecretStr | None = None
-
-
 class Project(BaseModel):
     """Project information."""
 
