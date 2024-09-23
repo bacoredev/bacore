@@ -1,4 +1,9 @@
-"""Configuration module for BACore."""
+"""Configuration module for BACore. Should probably not be used at all.
+
+# Configuration tools
+- Something
+- Something else
+"""
 
 import os
 from bacore.domain import settings

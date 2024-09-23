@@ -24,6 +24,8 @@ dynamic = ["version"]
 keywords = ["business analysis", "test automation", "testing" ]
 requires-python = ">=3.9"
 dependencies = [
+    "Faker>=29.0.0",
+    "hypothesis>=6.112.1",
     "pydantic>=2.9.1",
     "pydantic-settings>=2.4.0",
     "toml>=0.10.2" ]
@@ -38,9 +40,11 @@ dev = [
     "pytest-watch>=4.2.0",
     "python-language-server[all]>=0.36.2",
     "ruff>=0.5.2" ]
+web = [
+    "python-fasthtml>=0.6.4" ]
 
-[project.scripts]
-bacore = "bacore.cli.main:app"
+# [project.scripts]
+# bacore-web = "bacore.web.main"  # does not work yet
 
 [tool.maturin]
 python-source = "python"
