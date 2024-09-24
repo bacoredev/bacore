@@ -108,6 +108,8 @@ class FakerData(Faker):
         >>> s = FakerData('sweden')
         >>> s.name()
         'Marianne Åkesson'
+        >>> s.ssn()
+        '010131-2619'
     """
 
     def __init__(self, country_or_region: str):
@@ -147,3 +149,6 @@ class TestData:
 
     def last_name(self):
         return st.builds(FakerData(self.country_or_region).last_name)
+
+    def ssn(self):
+        return st.builds(FakerData(self.country_or_region).ssn)
