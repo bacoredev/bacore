@@ -5,12 +5,9 @@ from hypothesis import strategies as st
 from typing import Optional
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(frozen=True)
 class CountryCodes:
     """Country code for countries and regions.
-
-    This class is used by the FakerData class to specify the locale for the Faker instance.
-    Individual countries are accessed as attributes and regions as classmethods.
 
     Examples:
         >>> CountryCodes.denmark
@@ -41,27 +38,37 @@ class CountryCodes:
     united_states_of_america = 'en_US'
 
     @classmethod
-    def nordics(cls):
+    def nordics(cls) -> list[str]:
         return [cls.denmark, cls.finland, cls.norway, cls.sweden]
 
     @classmethod
-    def europe(cls):
-        countries = cls.nordics() + [cls.estonia, cls.latvia, cls.lithuania,
-                                     cls.france, cls.germany, cls.italy,
-                                     cls.netherlands, cls.poland, cls.portugal,
-                                     cls.spain, cls.ukraine, cls.united_kingdom]
+    def europe(cls) -> list[str]:
+        countries = cls.nordics() + [
+            cls.estonia, cls.latvia, cls.lithuania,
+            cls.france, cls.germany, cls.italy,
+            cls.netherlands, cls.poland, cls.portugal,
+            cls.spain, cls.ukraine, cls.united_kingdom
+        ]
         return sorted(countries)
 
     @classmethod
-    def world(cls):
-        countries = cls.europe() + [cls.china, cls.russia, cls.united_states_of_america]
+    def world(cls) -> list[str]:
+        countries = cls.europe() + [
+            cls.china, cls.russia, cls.united_states_of_america
+        ]
         return sorted(countries)
 
     @classmethod
     def for_locale(cls, name: str) -> list[str]:
         """Takes a locale specifier (country or region) and returns country codes.
         If the "attribute" is a function, then is it called.
+
+        Examples:
+            >>> CountryCodes.for_locale("sweden")
+            'sv_SE'
         """
+        if not hasattr(cls, name):
+            raise AttributeError(f"Country code with attribute '{name}' does not exist")
         if callable(getattr(cls, name)):
             return getattr(cls, name)()
         else:
@@ -92,16 +99,13 @@ class PytestRunData:
 class FakerData(Faker):
     """Test data for locale (country or region).
 
-    Adding additional data providers for a locale is only supported by `Faker` for one locale.
-    If multiple locales (a region) is used, then will additional data providers not be added.
-
-    use_weighting: Tries to match the real world occurrences of the data. If `True` will data generation be slower.
-
     Parameters:
-        country_or_region: A country or region for which test data is generated.
+        `country_or_region`: A country or region for which test data is generated.
+        `match_real_world_occurrences`: Makes `Faker` try to match the real world occurrences of the data. If `True`
+            will data generation be slower.
 
-    Funtions:
-        seed(): Seed the random number generator for reproducibility. Use only for "our own" test purposes.
+    Methods:
+        `seed()`: Seed the random number generator for reproducibility.
 
     Examples:
         >>> FakerData.seed(1)
@@ -109,46 +113,46 @@ class FakerData(Faker):
         >>> s.name()
         'Marianne Åkesson'
         >>> s.ssn()
-        '010131-2619'
+        '010201-2614'
     """
 
-    def __init__(self, country_or_region: str):
+    def __init__(self, country_or_region: str, match_real_world_occurrences: bool = False):
         country_codes = CountryCodes.for_locale(country_or_region)
-        super().__init__(country_codes, use_weighting=False)
+        self.match_real_world_occurrences = match_real_world_occurrences
+        super().__init__(country_codes, use_weighting=self.match_real_world_occurrences)
 
 
 class TestData:
-    """Test data strategies for hypothesis with Faker data.
+    """Test data strategies for hypothesis.
 
-    From the `hypothesis` documentation perspective is this a +dumb+ or at least less optimal way to generate test data.
-    Generally should we try to from_testdata [data based on core hypothesis strategies](https://hypothesis.readthedocs.io/en/latest/data.html).
-    A lot can, for example, be accomplished with the `st.from_regex` strategy. *However*, sometimes is all you need just a name
-    or an isin or something similar, and then can the functions below be used.
+    Parameters:
+        `country_or_region`: A country or region for which test data is generated.
+        `match_real_world_occurrences`: Makes `Faker` try to match the real world occurrences of the data. Default is
+            `False` and if `True` will data generation be slower.
     """
 
-    def __init__(self, country_or_region: str):
+    def __init__(self, country_or_region: str, match_real_world_occurrences: bool = False):
         self.country_or_region = country_or_region
+        self.faker_data = FakerData(self.country_or_region, match_real_world_occurrences=match_real_world_occurrences)
 
-    def company(self):
-        return st.builds(FakerData(self.country_or_region).company)
+    def company(self) -> st.SearchStrategy:
+        return st.builds(self.faker_data.company)
 
-    def currency_code(self):
-        return st.builds(FakerData(self.country_or_region).currency_code)
+    def currency_code(self) -> st.SearchStrategy:
+        return st.builds(self.faker_data.currency_code)
 
-    def first_name(self):
-        return st.builds(FakerData(self.country_or_region).first_name)
+    def first_name(self) -> st.SearchStrategy:
+        return st.builds(self.faker_data.first_name)
 
-    def isin(self):
-        match self.country_or_region:
-            case "sweden":
-                return st.from_regex(r"\ASE[0-9]{10}\Z")
-            case "finland":
-                return st.from_regex(r"\AFI[0-9]{10}\Z")
-            case _:
-                return st.from_regex(r"\A[X]{2}[A-Z0-9]{9}[0-9]\Z")
+    def isin(self) -> st.SearchStrategy:
+        regex_map = {
+            "sweden": r"\ASE[0-9]{10}\Z",
+            "finland": r"\AFI[0-9]{10}\Z"
+        }
+        return st.from_regex(regex_map.get(self.country_or_region, r"\A[X]{2}[A-Z0-9]{9}[0-9]\Z"))
 
-    def last_name(self):
-        return st.builds(FakerData(self.country_or_region).last_name)
+    def last_name(self) -> st.SearchStrategy:
+        return st.builds(self.faker_data.last_name)
 
-    def ssn(self):
-        return st.builds(FakerData(self.country_or_region).ssn)
+    def ssn(self) -> st.SearchStrategy:
+        return st.builds(self.faker_data.ssn)
