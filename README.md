@@ -1,8 +1,6 @@
-# bacore
-Bacore is a business analysis and test automation framework. It is written in Python and is available through
-[pypi.org](https://pypi.org/project/bacore/).
+# BACcore
+Business Analysis Core (BACore) is framework around a set of tools for common business analysis work. The main focus of BACore is on documentation and testing. BACore is written in Python and Rust and is available through [pypi.org](https://pypi.org/project/bacore/) and on [Github](https://github.com/bacoredev/bacore).
 
-Documentation is available at [bacore.dev](https://bacore.dev).
+## Getting Started
 
-It is *very* early days for bacore, and the developers would ask you to let it "cook" for a bit longer before trying it
-out.
+1. Download BACore with pip: `pip install bacore`

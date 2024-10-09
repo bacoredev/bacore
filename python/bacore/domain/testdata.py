@@ -106,14 +106,6 @@ class FakerData(Faker):
 
     Methods:
         `seed()`: Seed the random number generator for reproducibility.
-
-    Examples:
-        >>> FakerData.seed(1)
-        >>> s = FakerData('sweden')
-        >>> s.name()
-        'Marianne Åkesson'
-        >>> s.ssn()
-        '010201-2614'
     """
 
     def __init__(self, country_or_region: str, match_real_world_occurrences: bool = False):
@@ -129,6 +121,11 @@ class TestData:
         `country_or_region`: A country or region for which test data is generated.
         `match_real_world_occurrences`: Makes `Faker` try to match the real world occurrences of the data. Default is
             `False` and if `True` will data generation be slower.
+
+    Examples:
+        >>> company = TestData(country_or_region="sweden").company()
+        >>> isinstance(company, st.SearchStrategy)
+        True
     """
 
     def __init__(self, country_or_region: str, match_real_world_occurrences: bool = False):

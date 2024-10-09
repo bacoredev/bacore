@@ -1,7 +1,7 @@
 """CLI Typer interface."""
 
 from bacore.domain import files, settings
-from bacore.interactors import retrieve
+from bacore.interactors.file_handler import file_as_dict
 from pathlib import Path
 from typing import Optional
 
@@ -12,7 +12,7 @@ class ProjectInfo:
     def __init__(self, pyproject_file: Path):
         """Initialize."""
         self._pyproject_file_toml_object = files.TOML(path=pyproject_file)
-        self._project_info_dict = retrieve.file_as_dict(
+        self._project_info_dict = file_as_dict(
             file=self._pyproject_file_toml_object
         )
         self._project_info = settings.Project(

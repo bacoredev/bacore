@@ -148,3 +148,7 @@ class SystemSettings(BaseSettings):
     def os(self) -> str:
         """Operating system."""
         return self._system_info.os
+
+
+def just_because():
+    pass
