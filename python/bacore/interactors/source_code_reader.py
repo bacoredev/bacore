@@ -25,7 +25,7 @@ from types import ModuleType
 #     return module_names
 
 
-def get_modlue_names(package_path: Path, base_package=''):
+def get_module_names(package_path: Path, base_package=''):
     pass
     # module_names: set({})
 

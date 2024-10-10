@@ -43,9 +43,6 @@ dev = [
 web = [
     "python-fasthtml>=0.6.4" ]
 
-# [project.scripts]
-# bacore-web = "bacore.web.main"  # does not work yet
-
 [tool.maturin]
 python-source = "python"
 module-name = "bacore._bacore"
