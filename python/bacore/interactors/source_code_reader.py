@@ -5,31 +5,6 @@ from pathlib import Path
 from types import ModuleType
 
 
-# def get_module_names_recursive(package_path, base_package=''):
-#     module_names = []
-#     for entry in os.listdir(package_path):
-#         full_path = os.path.join(package_path, entry)
-#         if entry.endswith('.py') and not entry.startswith('__'):
-#             module_name = entry[:-3]  # Remove '.py' extension
-#             if base_package:
-#                 module_name = f"{base_package}.{module_name}"
-#             module_names.append(module_name)
-#         elif os.path.isdir(full_path) and \
-#              os.path.isfile(os.path.join(full_path, '__init__.py')):
-#             subpackage = entry
-#             if base_package:
-#                 subpackage = f"{base_package}.{subpackage}"
-#             module_names.append(subpackage)
-#             # Recursively search in the subpackage
-#             module_names.extend(get_module_names_recursive(full_path, subpackage))
-#     return module_names
-
-
-def get_module_names(package_path: Path, base_package=''):
-    pass
-    # module_names: set({})
-
-
 def get_module_from_name(module_name: str) -> ModuleType:
     """Import a module by name.
 
@@ -82,3 +57,52 @@ def get_module_members(module_name: str):
     ]
 
     return module_members
+
+
+class SrcF:
+    """Python source File."""
+
+    def __init__(self, path: Path):
+        self.path = path
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        if not value.is_file():
+            raise ValueError(f'The path "{value}" is not a valid file.')
+        self._path = value
+
+    @property
+    def name(self):
+        if self.path.name.startswith('__init__.py'):
+            return self.path.parent.name
+        else:
+            return self.path.name[:-3]
+
+    def members(self):
+        return [member for _, member in inspect.getmembers(self.path) if is_member_of_module(member, self.path)]
+
+    def cls_members(self):
+        """Class members of source file."""
+        return ""
+
+
+class SrcD:
+    """Source directory."""
+
+    def __init__(self, path: Path):
+        self.path = path
+
+    @property
+    def name(self):
+        return self.path.name
+    # sub_folders: list[Path]
+    # src_files: list[SrcF]
+
+
+def list_files_in_dir(dir: Path, recursive: bool):
+    """List all files in directory recursively as a tree."""
+    pass

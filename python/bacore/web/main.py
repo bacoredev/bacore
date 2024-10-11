@@ -40,7 +40,6 @@ def home():
     return Titled("BACore",
                   div_from_markdown(file=Path('README.md')),
                   P(A('See the docs', href='/docs')),
-                  P(A('Todos', href='/todos')),  # Does not have to be a link, but could be anything.
                   id=1)
 
 
@@ -48,8 +47,7 @@ def home():
 def docs():
     """The documentation information."""
     return Titled('Docs',
-                  P(
-                      A('Back', href='/')),
+                  P(A('Back', href='/')),
                   P('Docs section:',
                     Ul(
                         Li('Domains',
@@ -84,23 +82,6 @@ def docs_domain_settings():
 @rt('/docs/interactors/source_code_reader')
 def docs_interactors_source_code_reader():
     return module_doc(module_name='bacore.interactors.source_code_reader', doc_title="Source Code Reader")
-
-
-@rt('/todos')
-def todos_():
-    return Titled('Todos',
-                  P(A('Add Todo', hx_get='/todos/add'),
-                    Div(' '),  # Would like to ad some space here
-                    A('Back', href='/')),
-                  Ul(*todos()))
-
-
-@rt('/todos/add')
-def todos_add():
-    return Titled('Todos Add',
-                  todos.insert(Todo(title="Sixth todo", done=False)),
-                  P(A('Back', href='/todos'))
-                  )
 
 
 serve(port=7001)

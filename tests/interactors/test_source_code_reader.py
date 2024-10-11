@@ -12,7 +12,7 @@ from types import ModuleType
 @pytest.fixture(scope="session")
 def fixt_python_src_file_path() -> str:
     try:
-        files = get_files_in_dir(dir="python/bacore/", recursive=True, pattern="[a-z]*.py")
+        files = get_files_in_dir(directory="python/bacore/", recursive=True, pattern="[a-z]*.py")
     except FileNotFoundError:
         raise FileNotFoundError("No files found at path")
 
@@ -56,3 +56,23 @@ def test_get_module_members(fixt_python_src_file_path):
     members = source_code_reader.get_module_members(module_name)
     for member in members:
         assert inspect.getfile(member) == module_file
+
+
+def test_srcf_with_dir():
+    with pytest.raises(ValueError):
+        source_code_reader.SrcF(path=Path('python/bacore/domain/'))
+
+
+def test_srcf_module_name():
+    settings_file = source_code_reader.SrcF(path=Path('python/bacore/domain/settings.py'))
+    assert settings_file.name == "settings"
+
+
+def test_srcf_init_module_name():
+    init_file = source_code_reader.SrcF(path=Path('python/bacore/__init__.py'))
+    assert init_file.name == "bacore"
+
+
+def test_srcf_members():
+    settings_file = source_code_reader.SrcF(path=Path('python/bacore/domain/settings.py'))
+    assert settings_file.members() == ['']

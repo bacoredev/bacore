@@ -1,7 +1,6 @@
 """FastHTML web interface."""
-import inspect
 from bacore.interactors.file_handler import read_markdown_file
-from bacore.interactors.source_code_reader import get_module_members, get_module_from_name, is_member_of_module
+from bacore.interactors.source_code_reader import get_module_members, get_module_from_name
 from fasthtml.common import A, Div, Li, P, Ul, Titled
 from pathlib import Path
 
