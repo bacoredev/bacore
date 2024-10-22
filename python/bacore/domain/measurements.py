@@ -28,7 +28,6 @@ class Time:
     Examples:
         >>> Time().due(2024, 1, 1)
         True
-
     """
 
     now = datetime.now()

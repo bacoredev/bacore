@@ -10,9 +10,9 @@ pytestmark = pytest.mark.domain
 class TestTOML:
     """Tests for TOML entity."""
 
-    def test_path(self, fixture_pyproject_file):
+    def test_path(self, fixt_dir_with_files):
         """Test path."""
-        toml_file = files.TOML(path=fixture_pyproject_file)
+        toml_file = files.TOML(path=fixt_dir_with_files / "pyproject.toml")
         assert isinstance(toml_file.path, Path)
 
     def test_path_fail_with_string(self):
@@ -20,7 +20,7 @@ class TestTOML:
         with pytest.raises(TypeError):
             files.TOML(path="pyproject.toml")
 
-    def test_data_to_dict(self, fixture_pyproject_file):
+    def test_data_to_dict(self, fixt_dir_with_files):
         """Test toml_file_content."""
-        content = files.TOML(path=fixture_pyproject_file)
+        content = files.TOML(path=fixt_dir_with_files / "pyproject.toml")
         assert isinstance(content.data_to_dict(), dict)

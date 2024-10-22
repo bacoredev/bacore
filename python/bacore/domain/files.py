@@ -1,7 +1,6 @@
 """Module domain files for handling of files and directories."""
 import toml
 from pathlib import Path
-from pydantic import BaseModel
 
 
 class TOML:

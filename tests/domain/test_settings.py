@@ -6,11 +6,6 @@ from bacore.domain import settings
 pytestmark = pytest.mark.domain
 
 
-@pytest.fixture
-def fixture_project_root_dir(fixture_pyproject_file):
-    return fixture_pyproject_file.parent
-
-
 class TestCredentials:
     """Tests for Credentials entity."""
 
@@ -47,17 +42,17 @@ class TestProject:
 class TestProjectSettings:
     """Tests for ProjectSettings entity."""
 
-    def test_path_must_be_directory(self, fixture_project_root_dir):
+    def test_path_must_be_directory(self, fixt_dir_with_files):
         """Test path_must_be_directory."""
         with pytest.raises(ValueError):
             settings.ProjectSettings(
-                project_root_dir=fixture_project_root_dir / "wrong_path"
+                project_root_dir=fixt_dir_with_files / "wrong_path"
             )
 
-    def test_project_settings(self, fixture_project_root_dir):
+    def test_project_settings(self, fixt_dir_with_files):
         """Test ProjectSettings."""
         project_settings = settings.ProjectSettings(
-            project_root_dir=fixture_project_root_dir
+            project_root_dir=fixt_dir_with_files
         )
         assert project_settings.name == "bacore"
         assert project_settings.version == "1.0.0"
@@ -86,10 +81,11 @@ class TestSecret:
 class TestSystem:
     """Test for SystemInfo."""
 
-    def test_os(self):
+    @pytest.mark.parametrize("test_input, expected", [('Darwin', 'Darwin'), ('Linux', 'Linux'), ('Windows', 'Windows')])
+    def test_os(self, test_input, expected):
         """Test os. (Darwin is macOS.)"""
-        system_info = settings.System(os="Darwin")
-        assert system_info.os in ["Darwin", "Linux", "Windows"]
+        system_info = settings.System(os=test_input)
+        assert system_info.os == expected
 
     def test_os_must_be_supported(self):
         """Test os_must_be_supported."""

@@ -27,7 +27,6 @@ def get_files_in_dir(directory: Path, recursive: bool, pattern: str = "*") -> li
     return [file_path for file_path in find_function(pattern) if file_path.is_file()]
 
 
-
 @validate_call
 def delete_files(
     path: Path,

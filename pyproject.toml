@@ -49,6 +49,11 @@ module-name = "bacore._bacore"
 features = ["pyo3/extension-module"]
 compatibility = "manylinux2014"
 
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+
+
 [tool.pytest.ini_options]
 testpaths = "tests"
 addopts = [
