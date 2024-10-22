@@ -6,7 +6,8 @@
 # Resources:
 - FastHTML uses [Pico CSS](https://picocss.com).
 """
-from bacore.interactors.source_code_reader import SrcDir, SrcFile, package_init_file
+from bacore.domain.source_code import DirectoryModel
+from bacore.interactors.source_code_reader import get_package_init_file
 from bacore.interfaces.web_fasthtml import div_from_markdown
 from fasthtml.common import A, Div, HighlightJS, Li, P, Ul, MarkdownJS, Titled, fast_app, serve
 from pathlib import Path
@@ -31,7 +32,7 @@ def num_list(up_to_and_including: int):
 
 NumList = num_list
 
-bacore_pkg = SrcDir(path=Path('python/bacore'), package_root='bacore')
+bacore_pkg = DirectoryModel(path=Path('python/bacore'), package_root='bacore')
 
 
 @rt('/')
@@ -44,7 +45,7 @@ def home():
 
 @rt('/docs')
 def docs():
-    bacore_init = package_init_file(package_path=Path('python/bacore'), package_root='bacore')
+    bacore_init = get_package_init_file(package_path=Path('python/bacore'), package_root='bacore')
     return Titled('Documentation',
                   P(A('Back', href='/')),
                   Div(Ul(*[Li(A(src_file.name.title(), href=f'/docs/{src_file.name}')) for src_file in bacore_pkg.src_files])),
@@ -54,8 +55,8 @@ def docs():
 
 @rt('/docs/{doc_page}')
 def docs_file(doc_page: str):
-    src_dir = SrcDir(path=Path('python/bacore'), package_root='bacore')
-    pages = src_dir.src_files
+    src_dir = DirectoryModel(path=Path('python/bacore'), package_root='bacore')
+    pages = src_dir.modules
     found_page = None
 
     for page in pages:
