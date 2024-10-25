@@ -14,11 +14,13 @@ class FunctionModel(BaseModel):
     @computed_field
     @property
     def name(self) -> str:
-        return self.func.__name__
+        """Function name."""
+        return self.func.__name__.replace('_', ' ')
 
     @computed_field
     @property
     def doc(self) -> str | None:
+        """Function docstring."""
         return inspect.getdoc(self.func)
 
 
@@ -29,7 +31,7 @@ class ClassModel(BaseModel):
     @computed_field
     @property
     def name(self) -> str:
-        return self.klass.__name__
+        return self.klass.__name__.replace('_', ' ')
 
     @computed_field
     @property
@@ -40,16 +42,18 @@ class ClassModel(BaseModel):
         """Get functions as members from module and type as 'SrcFunc' class."""
         return [
             FunctionModel(func=member)
-            for _, member in inspect.getmembers(self.klass.__module__)
-            if (inspect.isfunction(member) or inspect.ismethod(member)
-                and member.__module__.startswith(self.klass.__module__))
+            for _, member in inspect.getmembers(self.klass)
+            if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, '__wrapped__')) and member.__module__.startswith(self.klass.__module__)
         ]
 
     def classes(self) -> list['ClassModel']:
-        """Get classes as members from module and type as 'SrcClass' class."""
+        """Get classes as members from module and type as 'SrcClass' class.
+
+        **Todo:** Recreate this function as recursive.
+        """
         return [
             ClassModel(klass=member)
-            for _, member in inspect.getmembers(self.klass.__module__)
+            for _, member in inspect.getmembers(self.klass)
             if inspect.isclass(member) and member.__module__.startswith(self.klass.__module__)
         ]
 
@@ -90,7 +94,7 @@ class ModuleModel(BaseModel):
         if self.path.name.startswith('__init__.py'):
             return self.path.parent.name
         else:
-            return self.path.name[:-3]
+            return self.path.name[:-3].replace('_', ' ')
 
     def doc(self) -> str | None:
         return self._as_module().__doc__
@@ -100,8 +104,7 @@ class ModuleModel(BaseModel):
         return [
             FunctionModel(func=member)
             for _, member in inspect.getmembers(self._as_module())
-            if (inspect.isfunction(member) or inspect.ismethod(member)
-                and member.__module__.startswith(self._module_path))
+            if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, '__wrapped__')) and member.__module__.startswith(self._module_path)
         ]
 
     def classes(self) -> list[ClassModel]:
