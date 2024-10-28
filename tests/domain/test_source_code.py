@@ -62,7 +62,7 @@ class TestModuleModel:
         source_code_reader_function =  choice(self.source_code_reader_module.functions())
         assert isinstance(source_code_reader_function, FunctionModel)
 
-        assert len(self.web_main_module.functions()) == 3, self.web_main_module.functions()
+        assert len(self.web_main_module.functions()) == 2, self.web_main_module.functions()
 
     def test_classes(self):
         assert len(self.init_module.classes()) == 0, self.init_module.classes()

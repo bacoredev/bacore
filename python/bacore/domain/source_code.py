@@ -43,7 +43,9 @@ class ClassModel(BaseModel):
         return [
             FunctionModel(func=member)
             for _, member in inspect.getmembers(self.klass)
-            if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, '__wrapped__')) and member.__module__.startswith(self.klass.__module__)
+            if (inspect.isfunction(member) or
+                inspect.ismethod(member) or
+                hasattr(member, '__wrapped__')) and member.__module__.startswith(self.klass.__module__)
         ]
 
     def classes(self) -> list['ClassModel']:
@@ -113,6 +115,12 @@ class ModuleModel(BaseModel):
             ClassModel(klass=member)
             for _, member in inspect.getmembers(self._as_module())
             if inspect.isclass(member) and member.__module__.startswith(self._module_path)
+        ]
+
+    def submodules(self) -> list['ModuleModel']:
+        return [
+            ModuleModel(path=dir_path, package_root=self.package_root)
+            for dir_path in self.path.parent.glob('*.py') if dir_path.is_file()
         ]
 
 
