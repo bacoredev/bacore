@@ -32,6 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "debugpy>=1.8.7",
     "bpython>=0.24",
     "pdbpp>=0.10.3",
     "maturin>=1.7.1",
