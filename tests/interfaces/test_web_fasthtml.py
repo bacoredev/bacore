@@ -1,15 +1,30 @@
 """FastHTML web interface tests."""
 
+import httpx
 import pytest
 from bacore.domain.source_code import DirectoryModel, ModuleModel
 from bacore.interfaces.web_fasthtml import (
     Documentation,
     docs_path,
+    flexboxgrid,
     map_module_path_to_module,
     readme_page,
 )
 from pathlib import Path
 from random import choice
+
+
+def test_flexboxgrid_exists_on_cdn(fixt_internet_connection_established):
+    """Testing that flexbox grid still exists on the content delivery network."""
+    try:
+        response = httpx.get(flexboxgrid().href)
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        pytest.fail(f"HTTP error occurred: {exc}")
+    except httpx.RequestError as exc:
+        pytest.fail(f"Request error occurred: {exc}")
+
+    assert response, f"\nHeaders: {response.headers}\nContent: {response.content}"
 
 
 def test_readme_page():
@@ -31,6 +46,7 @@ def test_readme_page():
     ],
 )
 def test_docs_path(file_path, package_root, expected_url):
+    """Test that the documentation path is correctly generated."""
     src_module = ModuleModel(path=Path(file_path), package_root=package_root)
     docs_url = docs_path(module=src_module)
 

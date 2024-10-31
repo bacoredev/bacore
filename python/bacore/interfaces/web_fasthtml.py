@@ -2,8 +2,14 @@
 
 from bacore.domain.source_code import DirectoryModel, ModuleModel
 from bacore.interactors.file_handler import read_markdown_file
-from fasthtml.common import Div, H1, H2, H3, H4, Li, P, Ul, Titled
+from fasthtml.common import Div, H1, H2, H3, H4, Li, Link, P, Ul, Titled
 from pathlib import Path
+
+flexboxgrid = Link(
+    rel="stylesheet",
+    href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css",
+    type="text/css",
+)
 
 
 def readme_page(title: str, readme_file: Path, skip_title: bool = True) -> Titled:
@@ -18,6 +24,7 @@ def readme_page(title: str, readme_file: Path, skip_title: bool = True) -> Title
         A page as a FastHTML Titled page.
     """
     content = read_markdown_file(file=readme_file, skip_title=skip_title)
+
     return Titled(title, Div(content, cls="marked"))
 
 
@@ -28,6 +35,7 @@ def docs_path(module: ModuleModel) -> str:
     """
     package_root = module.package_root or ""
     package_offset = len(package_root) + 1 if package_root else 0
+
     return module._module_path[package_offset:].replace("__init__", "").replace("_", "-").replace(".", "/")
 
 
