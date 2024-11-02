@@ -59,10 +59,10 @@ class TestModuleModel:
         assert self.web_main_module.name == "main", self.web_main_module.name
 
     def test_doc(self):
-        assert self.init_module.doc().splitlines()[0] == "# BACore main init module"
-        assert self.source_code_module.doc().splitlines()[0] == "Source code entities."
-        assert self.source_code_reader_module.doc().splitlines()[0] == "Source code reader module."
-        assert self.web_main_module.doc().splitlines()[0] == "BACore documentation with FastHTML."
+        assert self.init_module.doc.splitlines()[0] == "# BACore main init module"
+        assert self.source_code_module.doc.splitlines()[0] == "Source code entities."
+        assert self.source_code_reader_module.doc.splitlines()[0] == "Source code reader module."
+        assert self.web_main_module.doc.splitlines()[0] == "BACore documentation with FastHTML."
 
     def test_functions(self):
         assert len(self.init_module.functions()) == 0, self.init_module.functions()
@@ -71,7 +71,7 @@ class TestModuleModel:
         source_code_reader_function = choice(self.source_code_reader_module.functions())
         assert isinstance(source_code_reader_function, FunctionModel)
 
-        assert len(self.web_main_module.functions()) == 3, self.web_main_module.functions()
+        assert len(self.web_main_module.functions()) == 4, self.web_main_module.functions()
 
     def test_classes(self):
         assert len(self.init_module.classes()) == 0, self.init_module.classes()
@@ -83,22 +83,22 @@ class TestModuleModel:
 
 
 class TestSrcClass:
-    source_code_class = ModuleModel(path=Path("python/bacore/domain/source_code.py"), package_root="bacore").classes()[
+    source_code_model = ModuleModel(path=Path("python/bacore/domain/source_code.py"), package_root="bacore").classes()[
         0
     ]
 
     def test_name(self):
-        assert self.source_code_class.name == "ClassModel"
+        assert self.source_code_model.name == "ClassModel"
 
     def test_doc(self):
-        assert self.source_code_class.doc == "Python class model."
+        assert self.source_code_model.doc == "Python class model."
 
     def test_functions(self):
-        assert len(self.source_code_class.functions()) != 0, self.source_code_class.functions()
+        assert len(self.source_code_model.functions()) != 0, self.source_code_model.functions()
 
     @pytest.mark.skip("Need to implement a recursive function for finding sub-classes.")
     def test_classes(self):
-        assert len(self.source_code_class.classes()) != 0, self.source_code_class.classes()
+        assert len(self.source_code_model.classes()) != 0, self.source_code_model.classes()
 
 
 class TestSrcFunc:

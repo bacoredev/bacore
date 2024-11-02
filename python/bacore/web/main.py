@@ -9,16 +9,29 @@
 
 from bacore.interfaces.web_fasthtml import (
     Documentation,
+    FuncFT,
+    MarkdownFT,
+    ModuleFT,
     doc_page,
     flexboxgrid,
-    readme_page,
 )
-from fasthtml.common import FastHTML, HighlightJS, MarkdownJS, picolink, serve
+from fasthtml.common import (
+    A,
+    FastHTML,
+    HighlightJS,
+    Li,
+    MarkdownJS,
+    Nav,
+    Titled,
+    Ul,
+    picolink,
+    serve,
+)
 from pathlib import Path
 
+readme_file = MarkdownFT(path=Path("readme.md"), skip_title=True)
 src_docs = Documentation(path=Path("python/bacore"), package_root="bacore")
 tests_docs = Documentation(path=Path("tests"), package_root="tests")
-
 
 headers = (
     flexboxgrid,
@@ -29,10 +42,28 @@ headers = (
 app = FastHTML(hdrs=headers, htmx=True, live=True)
 
 
+def nav_main():
+    """Main navigation menu, could also be called top nav."""
+    return Nav(
+        Ul(Li(A("Home", href="/"))),
+        Ul(
+            Li(A("Documentation", href="/docs")),
+            Li(A("Github", href="https://github.com/bacoredev/bacore/")),
+            Li(A("PyPi", href="https://pypi.org/project/bacore/")),
+        ),
+    )
+
+
 @app.get("/")
 def home():
     """The homepage for BACore."""
-    return readme_page(title="BACore", readme_file=Path("README.md"))
+    return Titled(
+        "BACore",
+        nav_main(),
+        readme_file,
+        FuncFT(func=nav_main),
+        ModuleFT(path=Path("python/bacore/web/main.py"), package_root="bacore"),
+    )
 
 
 @app.route("/docs/{path:path}", methods="get")

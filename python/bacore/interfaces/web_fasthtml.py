@@ -1,9 +1,13 @@
 """FastHTML web interface."""
 
-from bacore.domain.source_code import DirectoryModel, ModuleModel
-from bacore.interactors.file_handler import read_markdown_file
-from fasthtml.common import Div, H1, H2, H3, H4, Li, Link, P, Ul, Titled
-from pathlib import Path
+from bacore.domain.files import MarkdownFile
+from bacore.domain.source_code import (
+    ClassModel,
+    DirectoryModel,
+    FunctionModel,
+    ModuleModel,
+)
+from fasthtml.common import Div, H1, H2, H3, H4, Li, Link, Nav, P, Ul, Titled
 
 flexboxgrid = Link(
     rel="stylesheet",
@@ -12,20 +16,40 @@ flexboxgrid = Link(
 )
 
 
-def readme_page(title: str, readme_file: Path, skip_title: bool = True) -> Titled:
-    """Markdown file rendered in HTML format. The title of the markdown file is skipped.
+class ClassFT(ClassModel):
+    """Class model class."""
 
-    Parameters
-        `title`: Title of the page
-        `readme_file`: The path to the markdown file to be renered.
-        `skip_title`: If the title of the page should be skipped. Default is `True`.
+    def __ft__(self):
+        """Class docstrings rendered as HTML."""
+        return Div(self.doc, cls="marked")
 
-    Returns
-        A page as a FastHTML Titled page.
-    """
-    content = read_markdown_file(file=readme_file, skip_title=skip_title)
 
-    return Titled(title, Div(content, cls="marked"))
+class FuncFT(FunctionModel):
+    """Function class."""
+
+    def __ft__(self):
+        """Function model rendered as HTML."""
+        return Div(self.doc, cls="marked")
+
+
+class MarkdownFT(MarkdownFile):
+    """Markdown class."""
+
+    def __ft__(self):
+        """Markdown file renedered as HTML."""
+        return Div(self.read(), cls="marked")
+
+
+class ModuleFT(ModuleModel):
+    """Module model class."""
+
+    def __ft__(self):
+        """Module docstring rendered as HTML."""
+        return Div(self.doc, cls="marked")
+
+
+class DocsFT(DirectoryModel):
+    pass
 
 
 def docs_path(module: ModuleModel) -> str:
@@ -60,7 +84,6 @@ class Documentation(DirectoryModel):
     """Documentation pages for project."""
 
     def docs_tree(self) -> dict[str, ModuleModel]:
-        # self.package_root = self.package_root or ''
         return map_module_path_to_module(directory_model=self)
 
 

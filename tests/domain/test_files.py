@@ -1,10 +1,46 @@
 """Tests for domain.files module."""
 
 import pytest
-from bacore.domain import files
+from bacore.domain.files import MarkdownFile, TOML
 from pathlib import Path
 
 pytestmark = pytest.mark.domain
+
+
+def test_markdown_file(fixt_dir_with_files):
+    readme_file = fixt_dir_with_files / "readme.md"
+    content = MarkdownFile(path=readme_file, skip_title=False).read()
+    assert (
+        content
+        == """# BACore ReadMe File
+
+    This is some markdown content.
+
+    ## With sub-heading
+
+    - and some
+    - bullets
+
+    End of file.
+    """
+    )
+
+
+def test_markdown_file_without_title(fixt_dir_with_files):
+    readme_file = fixt_dir_with_files / "readme.md"
+    content = MarkdownFile(path=readme_file, skip_title=True).read()
+    assert (
+        content
+        == """This is some markdown content.
+
+    ## With sub-heading
+
+    - and some
+    - bullets
+
+    End of file.
+    """
+    )
 
 
 class TestTOML:
@@ -12,15 +48,15 @@ class TestTOML:
 
     def test_path(self, fixt_dir_with_files):
         """Test path."""
-        toml_file = files.TOML(path=fixt_dir_with_files / "pyproject.toml")
+        toml_file = TOML(path=fixt_dir_with_files / "pyproject.toml")
         assert isinstance(toml_file.path, Path)
 
     def test_path_fail_with_string(self):
         """Test path."""
         with pytest.raises(TypeError):
-            files.TOML(path="pyproject.toml")
+            TOML(path="pyproject.toml")
 
     def test_data_to_dict(self, fixt_dir_with_files):
         """Test toml_file_content."""
-        content = files.TOML(path=fixt_dir_with_files / "pyproject.toml")
+        content = TOML(path=fixt_dir_with_files / "pyproject.toml")
         assert isinstance(content.data_to_dict(), dict)

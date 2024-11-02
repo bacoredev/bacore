@@ -1,4 +1,5 @@
 """Source code entities."""
+
 import inspect
 from importlib import import_module
 from pathlib import Path
@@ -9,13 +10,14 @@ from typing import Callable, Optional
 
 class FunctionModel(BaseModel):
     """Python function model."""
+
     func: Callable
 
     @computed_field
     @property
     def name(self) -> str:
         """Function name."""
-        return self.func.__name__.replace('_', ' ')
+        return self.func.__name__.replace("_", " ")
 
     @computed_field
     @property
@@ -26,12 +28,13 @@ class FunctionModel(BaseModel):
 
 class ClassModel(BaseModel):
     """Python class model."""
+
     klass: type
 
     @computed_field
     @property
     def name(self) -> str:
-        return self.klass.__name__.replace('_', ' ')
+        return self.klass.__name__.replace("_", " ")
 
     @computed_field
     @property
@@ -43,12 +46,11 @@ class ClassModel(BaseModel):
         return [
             FunctionModel(func=member)
             for _, member in inspect.getmembers(self.klass)
-            if (inspect.isfunction(member) or
-                inspect.ismethod(member) or
-                hasattr(member, '__wrapped__')) and member.__module__.startswith(self.klass.__module__)
+            if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, "__wrapped__"))
+            and member.__module__.startswith(self.klass.__module__)
         ]
 
-    def classes(self) -> list['ClassModel']:
+    def classes(self) -> list["ClassModel"]:
         """Get classes as members from module and type as 'SrcClass' class.
 
         **Todo:** Recreate this function as recursive.
@@ -62,14 +64,15 @@ class ClassModel(BaseModel):
 
 class ModuleModel(BaseModel):
     """Python source file."""
+
     path: Path
     package_root: Optional[str] = None
 
-    @field_validator('path')
+    @field_validator("path")
     @classmethod
     def path_must_be_file(cls, v):
         if not v.is_file():
-            ValueError(f'path must point to a file, not {v}')
+            ValueError(f"path must point to a file, not {v}")
         return v
 
     @computed_field
@@ -79,10 +82,10 @@ class ModuleModel(BaseModel):
         src_file_without_suffix = self.path.with_suffix("")
         src_file_parts = src_file_without_suffix.parts
         if self.package_root is None:
-            return '.'.join(src_file_parts)
+            return ".".join(src_file_parts)
         else:
             src_root_index_start = src_file_parts.index(self.package_root)
-            return '.'.join(src_file_parts[src_root_index_start:])
+            return ".".join(src_file_parts[src_root_index_start:])
 
     def _as_module(self) -> ModuleType:
         try:
@@ -93,11 +96,12 @@ class ModuleModel(BaseModel):
     @computed_field
     @property
     def name(self) -> str:
-        if self.path.name.startswith('__init__.py'):
+        if self.path.name.startswith("__init__.py"):
             return self.path.parent.name
         else:
-            return self.path.name[:-3].replace('_', ' ')
+            return self.path.name[:-3].replace("_", " ")
 
+    @property
     def doc(self) -> str | None:
         return self._as_module().__doc__
 
@@ -106,7 +110,8 @@ class ModuleModel(BaseModel):
         return [
             FunctionModel(func=member)
             for _, member in inspect.getmembers(self._as_module())
-            if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, '__wrapped__')) and member.__module__.startswith(self._module_path)
+            if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, "__wrapped__"))
+            and member.__module__.startswith(self._module_path)
         ]
 
     def classes(self) -> list[ClassModel]:
@@ -117,15 +122,17 @@ class ModuleModel(BaseModel):
             if inspect.isclass(member) and member.__module__.startswith(self._module_path)
         ]
 
-    def submodules(self) -> list['ModuleModel']:
+    def submodules(self) -> list["ModuleModel"]:
         return [
             ModuleModel(path=dir_path, package_root=self.package_root)
-            for dir_path in self.path.parent.glob('*.py') if dir_path.is_file()
+            for dir_path in self.path.parent.glob("*.py")
+            if dir_path.is_file()
         ]
 
 
 class DirectoryModel(BaseModel):
     """Source directory."""
+
     path: Path
     package_root: Optional[str] = None
 
@@ -139,14 +146,15 @@ class DirectoryModel(BaseModel):
     def modules(self) -> list[ModuleModel]:
         return [
             ModuleModel(path=dir_path, package_root=self.package_root)
-            for dir_path in self.path.glob('*.py') if dir_path.is_file()
+            for dir_path in self.path.glob("*.py")
+            if dir_path.is_file()
         ]
 
     @computed_field
     @property
-    def directories(self) -> list['DirectoryModel']:
+    def directories(self) -> list["DirectoryModel"]:
         return [
             DirectoryModel(path=dir_path, package_root=self.package_root)
-            for dir_path in self.path.glob('*')
-            if dir_path.is_dir() and not (dir_path.name.startswith('__') or dir_path.name.startswith('.mypy_cache'))
+            for dir_path in self.path.glob("*")
+            if dir_path.is_dir() and not (dir_path.name.startswith("__") or dir_path.name.startswith(".mypy_cache"))
         ]

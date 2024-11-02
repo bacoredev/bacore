@@ -5,11 +5,12 @@ import pytest
 from bacore.domain.source_code import DirectoryModel, ModuleModel
 from bacore.interfaces.web_fasthtml import (
     Documentation,
+    MarkdownFT,
     docs_path,
     flexboxgrid,
     map_module_path_to_module,
-    readme_page,
 )
+from fasthtml.common import FT
 from pathlib import Path
 from random import choice
 
@@ -27,8 +28,10 @@ def test_flexboxgrid_exists_on_cdn(fixt_internet_connection_established):
     assert response, f"\nHeaders: {response.headers}\nContent: {response.content}"
 
 
-def test_readme_page():
-    assert isinstance(readme_page(title="BACore", readme_file=Path("README.md")), tuple)
+def test_markdown_file():
+    """Verify that a readme page is of type FT."""
+    readme_file = MarkdownFT(path=Path("README.md"), skip_title=True)
+    assert isinstance(readme_file.__ft__(), FT), readme_file.__ft__()
 
 
 @pytest.mark.parametrize(
