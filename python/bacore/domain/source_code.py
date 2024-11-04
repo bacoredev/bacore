@@ -34,6 +34,7 @@ class ClassModel(BaseModel):
     @computed_field
     @property
     def name(self) -> str:
+        """Name of class without underscores."""
         return self.klass.__name__.replace("_", " ")
 
     @computed_field
@@ -68,6 +69,10 @@ class ModuleModel(BaseModel):
     path: Path
     package_root: Optional[str] = None
 
+    def __lt__(self, other: "ModuleModel") -> bool:
+        """Defining ordering by module name."""
+        return self.path < other.path
+
     @field_validator("path")
     @classmethod
     def path_must_be_file(cls, v):
@@ -77,7 +82,15 @@ class ModuleModel(BaseModel):
 
     @computed_field
     @property
-    def _module_path(self) -> str:
+    def name(self) -> str:
+        if self.path.name.startswith("__init__.py"):
+            return self.path.parent.name
+        else:
+            return self.path.name[:-3].replace("_", " ")
+
+    @computed_field
+    @property
+    def uri(self) -> str:
         """Returns the path to the module with dot notation as a string and removes '.py'"""
         src_file_without_suffix = self.path.with_suffix("")
         src_file_parts = src_file_without_suffix.parts
@@ -89,17 +102,9 @@ class ModuleModel(BaseModel):
 
     def _as_module(self) -> ModuleType:
         try:
-            return import_module(self._module_path)
+            return import_module(self.uri)
         except ImportError:
-            raise ImportError(f"Failed to import {self._module_path}")
-
-    @computed_field
-    @property
-    def name(self) -> str:
-        if self.path.name.startswith("__init__.py"):
-            return self.path.parent.name
-        else:
-            return self.path.name[:-3].replace("_", " ")
+            raise ImportError(f"Failed to import {self.uri}")
 
     @property
     def doc(self) -> str | None:
@@ -111,7 +116,7 @@ class ModuleModel(BaseModel):
             FunctionModel(func=member)
             for _, member in inspect.getmembers(self._as_module())
             if (inspect.isfunction(member) or inspect.ismethod(member) or hasattr(member, "__wrapped__"))
-            and member.__module__.startswith(self._module_path)
+            and member.__module__.startswith(self.uri)
         ]
 
     def classes(self) -> list[ClassModel]:
@@ -119,14 +124,7 @@ class ModuleModel(BaseModel):
         return [
             ClassModel(klass=member)
             for _, member in inspect.getmembers(self._as_module())
-            if inspect.isclass(member) and member.__module__.startswith(self._module_path)
-        ]
-
-    def submodules(self) -> list["ModuleModel"]:
-        return [
-            ModuleModel(path=dir_path, package_root=self.package_root)
-            for dir_path in self.path.parent.glob("*.py")
-            if dir_path.is_file()
+            if inspect.isclass(member) and member.__module__.startswith(self.uri)
         ]
 
 
@@ -136,6 +134,9 @@ class DirectoryModel(BaseModel):
     path: Path
     package_root: Optional[str] = None
 
+    def __lt__(self, other: "DirectoryModel"):
+        return self.path < other.path
+
     @computed_field
     @property
     def name(self) -> str:
@@ -144,17 +145,19 @@ class DirectoryModel(BaseModel):
     @computed_field
     @property
     def modules(self) -> list[ModuleModel]:
-        return [
+        module_list = [
             ModuleModel(path=dir_path, package_root=self.package_root)
             for dir_path in self.path.glob("*.py")
             if dir_path.is_file()
         ]
+        return sorted(module_list)
 
     @computed_field
     @property
     def directories(self) -> list["DirectoryModel"]:
-        return [
+        directory_list = [
             DirectoryModel(path=dir_path, package_root=self.package_root)
             for dir_path in self.path.glob("*")
             if dir_path.is_dir() and not (dir_path.name.startswith("__") or dir_path.name.startswith(".mypy_cache"))
         ]
+        return sorted(directory_list)

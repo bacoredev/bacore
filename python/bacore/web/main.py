@@ -7,21 +7,25 @@
 - FastHTML uses [Pico CSS](https://picocss.com).
 """
 
-from bacore.interfaces.web_fasthtml import (
+from bacore.interfaces.fasthtml.common import (
     Documentation,
+    DocsFT,
     FuncFT,
     MarkdownFT,
     ModuleFT,
+    NavDocs,
     doc_page,
     flexboxgrid,
 )
 from fasthtml.common import (
     A,
+    Div,
     FastHTML,
     HighlightJS,
     Li,
     MarkdownJS,
     Nav,
+    P,
     Titled,
     Ul,
     picolink,
@@ -29,8 +33,6 @@ from fasthtml.common import (
 )
 from pathlib import Path
 
-readme_file = MarkdownFT(path=Path("readme.md"), skip_title=True)
-src_docs = Documentation(path=Path("python/bacore"), package_root="bacore")
 tests_docs = Documentation(path=Path("tests"), package_root="tests")
 
 headers = (
@@ -42,16 +44,18 @@ headers = (
 app = FastHTML(hdrs=headers, htmx=True, live=True)
 
 
-def nav_main():
-    """Main navigation menu, could also be called top nav."""
-    return Nav(
-        Ul(Li(A("Home", href="/"))),
-        Ul(
-            Li(A("Documentation", href="/docs")),
-            Li(A("Github", href="https://github.com/bacoredev/bacore/")),
-            Li(A("PyPi", href="https://pypi.org/project/bacore/")),
-        ),
-    )
+class NavTop:
+    """Top and main navigation."""
+
+    def __ft__(self):
+        return Nav(
+            Ul(Li(A("Home", href="/"))),
+            Ul(
+                Li(A("Documentation", href="/docs")),
+                Li(A("Github", href="https://github.com/bacoredev/bacore/")),
+                Li(A("PyPi", href="https://pypi.org/project/bacore/")),
+            ),
+        )
 
 
 @app.get("/")
@@ -59,17 +63,30 @@ def home():
     """The homepage for BACore."""
     return Titled(
         "BACore",
-        nav_main(),
-        readme_file,
-        FuncFT(func=nav_main),
-        ModuleFT(path=Path("python/bacore/web/main.py"), package_root="bacore"),
+        NavTop(),
+        MarkdownFT(path=Path("README.md"), skip_title=True),
+        Div("Welcome to BACore website."),
     )
 
 
-@app.route("/docs/{path:path}", methods="get")
+@app.get("/docs/{path:path}")
 def docs(path: str):
     """Documentation pages."""
-    return doc_page(doc_source=src_docs, url=path)
+    return Titled(
+        "Documentation",
+        NavTop(),
+        Div(
+            NavDocs(path=Path("python/bacore"), package_root="bacore"),
+            Div(
+                doc_page(
+                    doc_source=Documentation(path=Path("python/bacore"), package_root="bacore"),
+                    url=path,
+                ),
+                cls="col-xs-10",
+            ),
+            cls="row",
+        ),
+    )
 
 
 @app.route("/tests/{path:path}", methods="get")

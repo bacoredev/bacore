@@ -7,29 +7,14 @@ from bacore.domain.source_code import (
     FunctionModel,
     ModuleModel,
 )
-from fasthtml.common import Div, H1, H2, H3, H4, Li, Link, Nav, P, Ul, Titled
+from fasthtml.common import A, Aside, Div, H1, H2, H3, H4, Li, Link, Nav, P, Ul, Titled
+from pathlib import Path
 
 flexboxgrid = Link(
     rel="stylesheet",
     href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css",
     type="text/css",
 )
-
-
-class ClassFT(ClassModel):
-    """Class model class."""
-
-    def __ft__(self):
-        """Class docstrings rendered as HTML."""
-        return Div(self.doc, cls="marked")
-
-
-class FuncFT(FunctionModel):
-    """Function class."""
-
-    def __ft__(self):
-        """Function model rendered as HTML."""
-        return Div(self.doc, cls="marked")
 
 
 class MarkdownFT(MarkdownFile):
@@ -40,6 +25,22 @@ class MarkdownFT(MarkdownFile):
         return Div(self.read(), cls="marked")
 
 
+class FuncFT(FunctionModel):
+    """Function class."""
+
+    def __ft__(self):
+        """Function model rendered as HTML."""
+        return Div(self.doc, cls="marked")
+
+
+class ClassFT(ClassModel):
+    """Class model class."""
+
+    def __ft__(self):
+        """Class docstrings rendered as HTML."""
+        return Div(self.doc, cls="marked")
+
+
 class ModuleFT(ModuleModel):
     """Module model class."""
 
@@ -47,23 +48,22 @@ class ModuleFT(ModuleModel):
         """Module docstring rendered as HTML."""
         return Div(self.doc, cls="marked")
 
+    def classes(self):
+        return Div("# Heading of classes\nSome text", cls="marked")
 
-class DocsFT(DirectoryModel):
-    pass
 
+def uri_to(module: ModuleModel) -> str:
+    """Uniform resource identifier for module.
 
-def docs_path(module: ModuleModel) -> str:
-    """Create documentation web url path for module.
-
-    package_offset is increased by 1 to remove the leading slash from the module path.
+    `package_offset` is increased by one to remove the leading slash from the module path.
     """
     package_root = module.package_root or ""
-    package_offset = len(package_root) + 1 if package_root else 0
+    package_offset = len(package_root) + 1 if package_root != "" else 0
 
-    return module._module_path[package_offset:].replace("__init__", "").replace("_", "-").replace(".", "/")
+    return module.uri[package_offset:].replace("__init__", "").replace("_", "-").replace(".", "/")
 
 
-def map_module_path_to_module(
+def map_uri_to_module(
     directory_model: DirectoryModel,
 ) -> dict[str, ModuleModel]:
     """Collect all modules with their paths relative to the package_root.
@@ -72,19 +72,78 @@ def map_module_path_to_module(
         directory_model: The directory model to traverse
         package_root: The package to be considered as base package.
     """
-    path_module_mappings = {docs_path(module): module.model_copy() for module in directory_model.modules}
+    path_module_mappings = {uri_to(module): module.model_copy() for module in directory_model.modules}
 
     for subdirectory in directory_model.directories:
-        path_module_mappings.update(map_module_path_to_module(subdirectory))
+        path_module_mappings.update(map_uri_to_module(subdirectory))
 
     return path_module_mappings
+
+
+class SrcDirFT(DirectoryModel):
+    """Directory with Python source code.
+
+    The tree should be ordered alphabetically (per default).
+    The tree should follow the same branching structure as the folders have.
+
+    The base is the a chosen markdown file. It makes sense to use the README.md file for that.
+    Optionally should the tree contain more than one "roots". One root is the src tree and the other root is the tests
+    tree.
+    """
+
+    # def generate_directory_tree(self, directory: DirectoryModel) -> Ul:
+    #     """Recursively generate a nested <ul> structure for the directory tree."""
+
+    #     for module in directory.modules:
+    #         ul_tag += Li(A(module.name.title(), href=self.uri_to_url(module)))
+
+    #     return ul_tag
+
+    @staticmethod
+    def url_to_module_tree(directory_model: DirectoryModel):
+        url_to_module_mappings = Ul(
+            *[Li(A(module.name.title(), href=SrcDirFT.uri_to_url(module))) for module in directory_model.modules],
+            Ul(),
+        )
+
+        # for subdirectory in directory_model.directories:
+        #     url_to_module_mappings.update("test")
+
+        return Div(str(type(url_to_module_mappings)))
+
+
+class NavDocs(DirectoryModel):
+    @staticmethod
+    def uri_to_url(module: ModuleModel):
+        """Convert module URI to a URL path.
+
+        `package_offset` is increased by one to remove the leading slash from the module path.
+        """
+        package_root = module.package_root or ""
+        package_offset = len(package_root) + 1 if package_root != "" else 0
+        return module.uri[package_offset:].replace("__init__", "").replace("_", "-").replace(".", "/")
+
+    def __ft__(self):
+        return Aside(
+            P("Directory tree urls"),
+            Nav(
+                Ul(
+                    *[
+                        Li(A(module.name.title(), href=self.uri_to_url(module)))
+                        for directory in self.directories
+                        for module in directory.modules
+                    ]
+                )
+            ),
+            cls="col-xs-2",
+        )
 
 
 class Documentation(DirectoryModel):
     """Documentation pages for project."""
 
     def docs_tree(self) -> dict[str, ModuleModel]:
-        return map_module_path_to_module(directory_model=self)
+        return map_uri_to_module(directory_model=self)
 
 
 def doc_page(doc_source: Documentation, url: str) -> Titled:
@@ -100,9 +159,8 @@ def doc_page(doc_source: Documentation, url: str) -> Titled:
     funcs = module.functions()
     classes = module.classes()
 
-    return Titled(
-        module.name.title(),
-        Div(module.doc(), cls="marked"),
+    return Div(
+        Div(module.doc, cls="marked"),
         (
             Div(
                 H1("Module Functions"),
@@ -164,3 +222,32 @@ def doc_page(doc_source: Documentation, url: str) -> Titled:
             else ""
         ),
     )
+
+
+class DocsFT:
+    """Creates a navigation menu as an aside.
+    Creates a page for each source code file.
+    The pages have:
+    - the documentation string for the module.
+
+    - A list of all classes
+    - The documentation string for all classes
+    - A list of all class methods.
+    - The documentation string for all class methods.
+
+    - A list of all module functions.
+    - The documentation string for all the module functions.
+    The classes source"""
+
+    def __init__(self, src_package: Path, src_package_root, url: str):
+        self.nav_docs = NavDocs(path=src_package, package_root=src_package_root)
+        self.src_package = src_package
+        self.src_package_root = src_package_root
+        self.url = url
+
+    def __ft__(self):
+        return Div(
+            self.nav_docs,
+            Div(doc_page(doc_source=self.src_package, url=self.url), cls="col-xs-10"),
+            cls="row",
+        )

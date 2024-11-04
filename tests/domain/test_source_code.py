@@ -20,7 +20,7 @@ class TestDirectoryModel:
         assert self.src_dir.path == Path("python/bacore")
 
     def test_name(self):
-        assert self.src_dir.name == "bacore", self.src_dir
+        assert self.src_dir.name == "bacore", f"expected 'bacore' but got {self.src_dir.name}"
 
     def test_src_files(self):
         module = choice(self.src_dir.modules)
@@ -40,23 +40,23 @@ class TestModuleModel:
     )
     web_main_module = ModuleModel(path=Path("python/bacore/web/main.py"), package_root="bacore")
 
-    def test_module_path(self):
-        assert self.init_module._module_path == "bacore.__init__"
-        assert self.source_code_module._module_path == "bacore.domain.source_code"
-        assert self.source_code_reader_module._module_path == "bacore.interactors.source_code_reader"
-        assert self.web_main_module._module_path == "bacore.web.main"
+    def test_name(self):
+        assert self.init_module.name == "bacore", self.source_code_module.name
+        assert self.source_code_module.name == "source code", self.source_code_module.name
+        assert self.source_code_reader_module.name == "source code reader", self.source_code_module.name
+        assert self.web_main_module.name == "main", self.web_main_module.name
+
+    def test_uri(self):
+        assert self.init_module.uri == "bacore.__init__"
+        assert self.source_code_module.uri == "bacore.domain.source_code"
+        assert self.source_code_reader_module.uri == "bacore.interactors.source_code_reader"
+        assert self.web_main_module.uri == "bacore.web.main"
 
     def test_as_module(self):
         assert isinstance(self.init_module._as_module(), ModuleType)
         assert isinstance(self.source_code_module._as_module(), ModuleType)
         assert isinstance(self.source_code_reader_module._as_module(), ModuleType)
         assert isinstance(self.web_main_module._as_module(), ModuleType)
-
-    def test_name(self):
-        assert self.init_module.name == "bacore", self.source_code_module.name
-        assert self.source_code_module.name == "source code", self.source_code_module.name
-        assert self.source_code_reader_module.name == "source code reader", self.source_code_module.name
-        assert self.web_main_module.name == "main", self.web_main_module.name
 
     def test_doc(self):
         assert self.init_module.doc.splitlines()[0] == "# BACore main init module"
@@ -71,7 +71,7 @@ class TestModuleModel:
         source_code_reader_function = choice(self.source_code_reader_module.functions())
         assert isinstance(source_code_reader_function, FunctionModel)
 
-        assert len(self.web_main_module.functions()) == 4, self.web_main_module.functions()
+        assert len(self.web_main_module.functions()) == 3, self.web_main_module.functions()
 
     def test_classes(self):
         assert len(self.init_module.classes()) == 0, self.init_module.classes()
