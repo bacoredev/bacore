@@ -9,10 +9,7 @@
 
 from bacore.interfaces.fasthtml.common import (
     Documentation,
-    DocsFT,
-    FuncFT,
     MarkdownFT,
-    ModuleFT,
     NavDocs,
     doc_page,
     flexboxgrid,
@@ -25,7 +22,6 @@ from fasthtml.common import (
     Li,
     MarkdownJS,
     Nav,
-    P,
     Titled,
     Ul,
     picolink,

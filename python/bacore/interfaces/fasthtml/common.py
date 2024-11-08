@@ -125,7 +125,6 @@ class NavDocs(DirectoryModel):
 
     def __ft__(self):
         return Aside(
-            P("Directory tree urls"),
             Nav(
                 Ul(
                     *[

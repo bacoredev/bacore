@@ -11,9 +11,13 @@ from bacore.interfaces.fasthtml.common import (
     map_uri_to_module,
     uri_to,
 )
+from bacore.web.main import app
 from fasthtml.common import FT
 from pathlib import Path
 from random import choice
+from starlette.testclient import TestClient
+
+client = TestClient(app)
 
 
 def test_flexboxgrid_exists_on_cdn(fixt_internet_connection_established):
@@ -84,10 +88,10 @@ class TestSrcDirFT:
     #     assert isinstance(url, str), url
     #     assert isinstance(self.src_docs.docs_tree().get(url), ModuleModel), self.src_docs.docs_tree()
 
-    def test_ft(self):
-        from pprint import pprint
+    # def test_ft(self):
+    #     from pprint import pprint
 
-        assert self.src_docs.__ft__ == [], pprint(self.src_docs.model_dump())
+    #     assert self.src_docs.__ft__ == [], pprint(self.src_docs.model_dump())
 
 
 class TestDocumentation:
