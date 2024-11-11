@@ -79,7 +79,7 @@ class TestModuleModel:
         source_code_module_class = choice(self.source_code_module.classes())
         assert isinstance(source_code_module_class, ClassModel), self.source_code_module.classes()
 
-        assert len(self.source_code_reader_module.classes()) == 0, self.source_code_reader_module.classes()
+        assert len(self.source_code_reader_module.classes()) == 1, self.source_code_reader_module.classes()
 
 
 class TestSrcClass:

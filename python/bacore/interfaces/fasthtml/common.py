@@ -1,4 +1,11 @@
-"""FastHTML web interface."""
+"""FastHTML web interface.
+
+# FastHTML and JS
+Refer to this example for understanding on how to
+[write JavaScript with FastHTML](https://github.com/AnswerDotAI/fasthtml/blob/main/fasthtml/js.py).
+
+- [Rendering markdown after processing](https://docs.fastht.ml/tutorials/by_example.html#custom-scripts-and-styling).
+"""
 
 from bacore.domain.files import MarkdownFile
 from bacore.domain.source_code import (
@@ -7,7 +14,21 @@ from bacore.domain.source_code import (
     FunctionModel,
     ModuleModel,
 )
-from fasthtml.common import A, Aside, Div, H1, H2, H3, H4, Li, Link, Nav, P, Ul, Titled
+from fasthtml.common import (
+    A,
+    Aside,
+    Div,
+    H1,
+    H2,
+    H3,
+    H4,
+    Li,
+    Link,
+    Nav,
+    P,
+    Ul,
+    Titled,
+)
 from pathlib import Path
 
 flexboxgrid = Link(
@@ -132,7 +153,7 @@ class NavDocs(DirectoryModel):
                         for directory in self.directories
                         for module in directory.modules
                     ]
-                )
+                ),
             ),
             cls="col-xs-2",
         )
