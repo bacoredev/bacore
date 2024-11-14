@@ -16,11 +16,15 @@ def add_background_image(
     height: Optional[Length] = None,
     move_to_background: Optional[bool] = True,
 ) -> Picture:
-    """Add background image to a slide."""
+    """Add background image to a slide.
+
+    Parmeters:
+        move_to_background: If `True`, will move image furtherst back in the stack of elements.
+    """
     background_img = slide.shapes.add_picture(image_file=image_file, left=left, top=top, width=width, height=height)
     if move_to_background:
         slide.shapes._spTree.remove(background_img._element)
-        slide.shapes._spTree.insert(0, background_img._element)  # Assuming that z-level=0 is the background image.
+        slide.shapes._spTree.insert(2, background_img._element)
     return background_img
 
 
