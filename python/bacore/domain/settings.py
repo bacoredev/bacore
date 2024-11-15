@@ -1,7 +1,7 @@
 """Settings module for settings of BACore and its components."""
 
 import platform
-from bacore.domain import files
+from bacore.domain.files import TOMLFile
 from pathlib import Path
 from pydantic import BaseModel, Field, computed_field, field_validator, SecretStr
 from pydantic_settings import BaseSettings
@@ -86,16 +86,14 @@ class ProjectSettings(BaseSettings):
     def _pyproject_file(self) -> Path:
         project_file = self.path / "pyproject.toml"
         if project_file.is_file() is False:
-            raise FileNotFoundError(
-                f"Unable to find pyproject.toml file, got '{project_file}'"
-            )
+            raise FileNotFoundError(f"Unable to find pyproject.toml file, got '{project_file}'")
         return project_file
 
     @computed_field
     @property
     def _project_info_as_dict(self) -> dict:
         """pyproject.toml file as dictionary."""
-        return files.TOML(path=self._pyproject_file).data_to_dict()
+        return TOMLFile(path=self._pyproject_file).data_to_dict()
 
     @computed_field
     @property
@@ -117,21 +115,13 @@ class ProjectSettings(BaseSettings):
     def version(self) -> str:
         """Project name."""
         project_version = self._project_info.version
-        return (
-            project_version
-            if project_version is not None
-            else "No project version set."
-        )
+        return project_version if project_version is not None else "No project version set."
 
     @property
     def description(self) -> str:
         """Project description."""
         project_description = self._project_info.description
-        return (
-            project_description
-            if project_description is not None
-            else "No project description given."
-        )
+        return project_description if project_description is not None else "No project description given."
 
 
 class SystemSettings(BaseSettings):

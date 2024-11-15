@@ -1,29 +1,29 @@
 """Module domain files for handling of files and directories."""
 
 import toml
+from dataclasses import dataclass
 from pathlib import Path
 
 
-class MarkdownFile:
-    """Markdown file."""
+def ensure_path(path: str | Path) -> Path:
+    """Ensure the path is a Path object."""
+    return Path(path) if isinstance(path, str) else path
 
-    def __init__(self, path: Path, skip_title: bool):
-        if path.suffix not in [".md", ".markdown"]:
+
+@dataclass
+class MarkdownFile:
+    """Markdown file representation."""
+
+    path: Path
+    skip_title: bool
+
+    def __post_init__(self):
+        self.path = ensure_path(self.path)
+        if self.path.suffix not in [".md", ".markdown"]:
             raise ValueError("File should be in markdown format")
-        self.path = path
-        self.skip_title = skip_title
 
     def read(self) -> str:
-        """Read file.
-
-        Parameters:
-            `file`: File path
-            `skip_title`: Will skip the first line of the markdown file if it starts with the '#' character. Will also
-                          try to remove any newline characters which remains after the title has been removed.
-
-        Returns:
-            String of complete text or the text without the title.
-        """
+        """Read file and optionally strip the title line."""
         try:
             text = self.path.read_text()
         except OSError as e:
@@ -36,27 +36,22 @@ class MarkdownFile:
             return text
 
 
-class TOML:
-    """TOML file class."""
+@dataclass
+class TOMLFile:
+    """TOML file representation."""
 
-    def __init__(self, path: Path):
+    path: Path
+
+    def __post_init__(self):
         """Initialize."""
-        self.path = path
-
-    @property
-    def path(self):
-        """Get file path."""
-        return self._path
-
-    @path.setter
-    def path(self, value):
-        """Set file path as pathlib.Path object."""
-        if not isinstance(value, Path):
-            raise TypeError("Path must be a pathlib.Path object.")
-        self._path = value
+        self.path = ensure_path(self.path)
+        if self.path.suffix != ".toml":
+            raise ValueError("File should be in TOML format")
 
     def data_to_dict(self) -> dict:
         """Content as dictionary."""
-        with open(self.path, mode="r") as file:
-            content = toml.load(file)
+        try:
+            content = toml.loads(self.path.read_text())
+        except toml.TomlDecodeError as e:
+            raise ValueError(f"Error decoding TOML file {self.path}: {e}")
         return content

@@ -1,7 +1,7 @@
 """Tests for domain.files module."""
 
 import pytest
-from bacore.domain.files import MarkdownFile, TOML
+from bacore.domain.files import MarkdownFile, TOMLFile
 from pathlib import Path
 
 pytestmark = pytest.mark.domain
@@ -43,20 +43,15 @@ def test_markdown_file_without_title(fixt_dir_with_files):
     )
 
 
-class TestTOML:
+class TestTOMLFile:
     """Tests for TOML entity."""
 
     def test_path(self, fixt_dir_with_files):
         """Test path."""
-        toml_file = TOML(path=fixt_dir_with_files / "pyproject.toml")
+        toml_file = TOMLFile(path=fixt_dir_with_files / "pyproject.toml")
         assert isinstance(toml_file.path, Path)
-
-    def test_path_fail_with_string(self):
-        """Test path."""
-        with pytest.raises(TypeError):
-            TOML(path="pyproject.toml")
 
     def test_data_to_dict(self, fixt_dir_with_files):
         """Test toml_file_content."""
-        content = TOML(path=fixt_dir_with_files / "pyproject.toml")
+        content = TOMLFile(path=fixt_dir_with_files / "pyproject.toml")
         assert isinstance(content.data_to_dict(), dict)
