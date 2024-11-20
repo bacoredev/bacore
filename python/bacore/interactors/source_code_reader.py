@@ -47,6 +47,29 @@ class ExternalModule:
         except ImportError as e:
             raise ImportError(f"Failed to load module {self.module_name} with error: {e}")
 
+    def execute_func(self, function_name: str, accept_return_value: bool) -> Any:
+        """Execute a function from from an external module and return the values from what the function executed.
+
+        Parameters:
+            external_module: External module type.
+            function_name: Name of the function to execute in the external module.
+
+        Returns:
+            Return value of externally defined function.
+
+        Raises:
+            ValueError: If the function is not callable.
+        """
+        # ext_module = external_module.load()
+        func = getattr(self.load(), function_name, None)
+        if callable(func):
+            if accept_return_value:
+                return func()
+            else:
+                func()
+        else:
+            raise ValueError(f"Function is not callable {function_name}")
+
 
 def get_objects(
     object_holder: ModuleType | type,
@@ -96,29 +119,3 @@ def get_package_init_file(package_path: Path, package_root: Optional[str] = None
         if module.name == "bacore":
             return module
     raise FileNotFoundError("No '__init__.py' file found in the package.")
-
-
-def execute_func_from_external_module(
-    external_module: ExternalModule, function_name: str, accept_return_value: bool
-) -> Any:
-    """Execute a function from from an external module and return the values from what the function executed.
-
-    Parameters:
-        external_module: External module type.
-        function_name: Name of the function to execute in the external module.
-
-    Returns:
-        Return value of externally defined function.
-
-    Raises:
-        ValueError: If the function is not callable.
-    """
-    # ext_module = external_module.load()
-    func = getattr(external_module.load(), function_name, None)
-    if callable(func):
-        if accept_return_value:
-            return func()
-        else:
-            func()
-    else:
-        raise ValueError(f"Function is not callable {function_name}")

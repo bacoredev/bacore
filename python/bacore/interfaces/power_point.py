@@ -1,25 +1,31 @@
 """Power point interface."""
 
+from dataclasses import dataclass
 from pptx import Presentation
 from pptx.shapes.picture import Picture
 from pptx.slide import Slide
-from pptx.util import Inches, Length
-from typing import Optional
+from pptx.util import Inches, Length, Pt
 
 
 def add_background_image(
     slide: Slide,
     image_file: str,
-    left: Optional[Length] = 0,
-    top: Optional[Length] = 0,
-    width: Optional[Length] = None,
-    height: Optional[Length] = None,
-    move_to_background: Optional[bool] = True,
+    left: Length = 0,
+    top: Length = 0,
+    width: Length | None = None,
+    height: Length | None = None,
+    move_to_background: bool = True,
 ) -> Picture:
-    """Add background image to a slide.
+    """Add a background image to a slide.
 
-    Parmeters:
-        move_to_background: If `True`, will move image furtherst back in the stack of elements.
+    Parameters:
+        slide: The slide to which the image will be added.
+        image_file: Path to the image file.
+        left: The left position of the image.
+        top: The top position of the image.
+        width: The width of the image.
+        height: The height of the image.
+        move_to_background: If `True`, moves the image to the back of the stack.
     """
     background_img = slide.shapes.add_picture(image_file=image_file, left=left, top=top, width=width, height=height)
     if move_to_background:
@@ -35,7 +41,7 @@ class PowerPoint:
         `prs`: Contains the pptx.Presentation object.
 
     Methods:
-        `add_slide`: Add a slide from default tempalte using template index and having an optional title.
+        `add_slide`: Add a slide from default template using template index and having an optional title.
     """
 
     widescreen_width = Inches(13.33)
@@ -44,7 +50,7 @@ class PowerPoint:
     def __init__(self) -> None:
         self.prs = Presentation()
 
-    def add_slide(self, layout_index: int, title_text: Optional[str] = None) -> Slide:
+    def add_slide(self, layout_index: int, title_text: str | None = None) -> Slide:
         """Add a PowerPoint slide with an optional title text.
 
         Returns:
@@ -58,7 +64,30 @@ class PowerPoint:
         return slide
 
 
-def default_templates(widescreen_dimensions: Optional[bool] = True) -> None:
+@dataclass
+class Placeholder:
+    """A placeholder item inside of a slide."""
+
+    slide: Slide
+    id: int
+
+    def add_bullets(self, bullets: list[tuple[str, int | None, int]]):
+        """Add list of bullets to the slide.
+
+        Each bullet is a tuple which consist of the text as a string, then an optional int for the bullet level, then another in for the font size.
+        """
+        requirement_body = self.slide.shapes.placeholders[self.id]
+        requirement_body_tf = requirement_body.text_frame
+
+        for bullet_text, bullet_level, font_size in bullets:
+            requirement_body_tf_p = requirement_body_tf.add_paragraph()
+            requirement_body_tf_p.text = bullet_text
+            requirement_body_tf_p.font.size = Pt(font_size)
+            if bullet_level:
+                requirement_body_tf_p.level = bullet_level
+
+
+def default_templates(widescreen_dimensions: bool | None = True) -> None:
     """Create a power point slide presentation using default templates."""
     ppt = PowerPoint()
 
@@ -66,6 +95,7 @@ def default_templates(widescreen_dimensions: Optional[bool] = True) -> None:
         ppt.prs.slide_width = PowerPoint.widescreen_width
         ppt.prs.slide_height = PowerPoint.widescreen_height
 
-    [ppt.add_slide(layout_index) for layout_index in range(11)]
+    for layout_index in range(11):
+        ppt.add_slide(layout_index)
 
     ppt.prs.save("default_templates.pptx")
