@@ -8,7 +8,7 @@ from pptx.util import Inches, Length, Pt
 from typing import ClassVar
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PowerPoint:
     """PowerPoint class with pptx.Presentation as `prs` attribute.
 
@@ -83,7 +83,7 @@ class PowerPoint:
         prs.save("default_templates.pptx")
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Placeholder:
     """A placeholder item inside of a slide."""
 
