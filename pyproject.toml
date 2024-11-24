@@ -26,8 +26,8 @@ requires-python = ">=3.9"
 dependencies = [
     "Faker>=29.0.0",
     "hypothesis>=6.112.1",
-    "pydantic>=2.9.1",
     "pydantic-settings>=2.4.0",
+    "sqlmodel",
     "toml>=0.10.2" ]
 
 [project.optional-dependencies]

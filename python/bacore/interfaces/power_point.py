@@ -1,11 +1,17 @@
 """Power point interface."""
 
+from bacore.domain.measurements import Time
 from dataclasses import dataclass
 from pptx import Presentation
+from pptx.dml.color import RGBColor
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.shapes.picture import Picture
 from pptx.slide import Slide
 from pptx.util import Inches, Length, Pt
+from sqlmodel import SQLModel, Field
 from typing import ClassVar
+
+TODAY = Time().today_s
 
 
 @dataclass(frozen=True)
@@ -104,3 +110,48 @@ class Placeholder:
             requirement_body_tf_p.font.size = Pt(font_size)
             if bullet_level is not None:
                 requirement_body_tf_p.level = bullet_level
+
+
+class TitleSlide(SQLModel, table=True):
+    """Represents the title slide of a presentation."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    title: str = Field(index=True)
+    sub_title: str | None = Field(default=None)
+    background_image: str | None = Field(default=None)
+    date: str | None = Field(default=None)
+    logo: str | None = Field(default=None)
+
+    def create(self, ppt: PowerPoint) -> Slide:
+        """Create a title slide."""
+        slide = ppt.add_slide(0, self.title)
+        if self.background_image:
+            ppt.add_background_image(
+                slide,
+                self.background_image,
+                width=PowerPoint.widescreen_width,
+                height=Inches(7),
+            )
+        if self.sub_title:
+            subtitle = slide.shapes.placeholders[1]
+            subtitle.text = self.sub_title
+            subtitle.text_frame.paragraphs[0].font.italic = True
+            subtitle.text_frame.paragraphs[0].font.color.rbg = RGBColor(255, 0, 0)
+        if self.date:
+            date = slide.shapes.add_textbox(left=Inches(0.5), top=Inches(7.1), width=Inches(1), height=Inches(0.3))
+            date_tf = date.text_frame
+            date_tf.text = self.date
+            date_p = date_tf.paragraphs[0]
+            date_run = date_p.runs[0]
+            date_run.font.size = Pt(12)
+            date_run.font.italic = True
+            date_p.alignment = PP_ALIGN.CENTER
+            date_tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        if self.logo:
+            slide.shapes.add_picture(
+                self.logo,
+                left=Inches(11),
+                top=Inches(7),
+                width=Inches(1.5),
+            )
+        return slide
