@@ -8,13 +8,13 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.shapes.picture import Picture
 from pptx.slide import Slide
 from pptx.util import Inches, Length, Pt
-from sqlmodel import SQLModel, Field
+from sqlmodel import Field, SQLModel
 from typing import ClassVar
 
 TODAY = Time().today_s
 
 
-@dataclass(frozen=True)
+@dataclass
 class PowerPoint:
     """PowerPoint class with pptx.Presentation as `prs` attribute.
 
@@ -89,7 +89,7 @@ class PowerPoint:
         prs.save("default_templates.pptx")
 
 
-@dataclass(frozen=True)
+@dataclass
 class Placeholder:
     """A placeholder item inside of a slide."""
 
