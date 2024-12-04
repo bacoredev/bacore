@@ -137,32 +137,6 @@ class Bullet:
     url: str | None = None
 
 
-def create_bullets(container: Placeholder | TextFrame, bullets: list[Bullet]):
-    """Add bullets to a placeholder or text frame.
-
-    Arguments:
-        container (Union[Placeholder, TextFrame]): The container to add bullets to.
-        bullets (List[Bullet]): A list of Bullet instances to add.
-    """
-    if isinstance(container, Placeholder):
-        placeholder = container.slide.shapes.placeholders[container.number]
-        text_frame = placeholder.text_frame
-    else:
-        text_frame = container
-
-    for bullet in bullets:
-        paragraph = text_frame.add_paragraph()
-        if bullet.url:
-            paragraph = paragraph.add_run()
-            paragraph.text = bullet.text
-            paragraph.hyperlink.address = bullet.url
-        else:
-            paragraph.text = bullet.text
-        paragraph.font.size = Pt(bullet.font_size)
-        if bullet.bullet_level is not None:
-            paragraph.level = bullet.bullet_level
-
-
 class TitleSlide(SQLModel, table=True):
     """Represents the title slide of a presentation."""
 
@@ -215,3 +189,29 @@ class TitleSlide(SQLModel, table=True):
                 width=Inches(1.5),
             )
         return slide
+
+
+def create_bullets(container: Placeholder | TextFrame, bullets: list[Bullet]):
+    """Add bullets to a placeholder or text frame.
+
+    Arguments:
+        container (Union[Placeholder, TextFrame]): The container to add bullets to.
+        bullets (List[Bullet]): A list of Bullet instances to add.
+    """
+    if isinstance(container, Placeholder):
+        placeholder = container.slide.shapes.placeholders[container.number]
+        text_frame = placeholder.text_frame
+    else:
+        text_frame = container
+
+    for bullet in bullets:
+        paragraph = text_frame.add_paragraph()
+        if bullet.url:
+            paragraph = paragraph.add_run()
+            paragraph.text = bullet.text
+            paragraph.hyperlink.address = bullet.url
+        else:
+            paragraph.text = bullet.text
+        paragraph.font.size = Pt(bullet.font_size)
+        if bullet.bullet_level is not None:
+            paragraph.level = bullet.bullet_level
