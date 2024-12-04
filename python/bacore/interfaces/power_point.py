@@ -7,6 +7,7 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.shapes.picture import Picture
 from pptx.slide import Slide
+from pptx.text.text import TextFrame
 from pptx.util import Inches, Length, Pt
 from sqlmodel import Field, SQLModel
 from typing import ClassVar
@@ -16,13 +17,13 @@ TODAY = Time().today_s
 
 @dataclass
 class PowerPoint:
-    """PowerPoint class with pptx.Presentation as `prs` attribute.
+    """PowerPoint class encapsulating the pptx.Presentation object.
 
     Attributes:
-        `prs`: Contains the pptx.Presentation object.
-
-    Methods:
-        `add_slide`: Add a slide from default template using template index and having an optional title.
+        prs (Presentation): The PowerPoint presentation object.
+        background_layer (ClassVar[int]): Layer index for background elements.
+        widescreen_width (ClassVar[Inches]): Width for widescreen presentations.
+        widescreen_height (ClassVar[Inches]): Height for widescreen presentations.
     """
 
     prs = Presentation()
@@ -34,15 +35,23 @@ class PowerPoint:
     def add_slide(self, layout_index: int, title_text: str | None = None) -> Slide:
         """Add a PowerPoint slide with an optional title text.
 
+        Arguments:
+            layout_index (int): Index of the slide layout to use.
+            title_text (Optional[str]): Optional title text for the slide.
+
         Returns:
-            slide object
+            Slide: The newly added slide.
+
+        Raises:
+            ValueError: If the layout_index is out of range.
         """
-        if layout_index >= len(self.prs.slide_layouts):
+        if layout_index < 0 or layout_index >= len(self.prs.slide_layouts):
             raise ValueError(f"Layout index '{layout_index}' out of range.")
 
         slide_layout = self.prs.slide_layouts[layout_index]
         slide = self.prs.slides.add_slide(slide_layout)
-        if title_text:
+
+        if title_text and slide.shapes.title:
             title = slide.shapes.title
             title.text = title_text
         return slide
@@ -59,14 +68,17 @@ class PowerPoint:
     ) -> Picture:
         """Add a background image to a slide.
 
-        Parameters:
-            slide: The slide to which the image will be added.
-            image_file: Path to the image file.
-            left: The left position of the image.
-            top: The top position of the image.
-            width: The width of the image.
-            height: The height of the image.
-            move_to_background: If `True`, moves the image to the back of the stack.
+        Arguments:
+            slide (Slide): The slide to which the image will be added.
+            image_file (str): Path to the image file.
+            left (Inches, optional): The left position of the image. Defaults to Inches(0).
+            top (Inches, optional): The top position of the image. Defaults to Inches(0).
+            width (Optional[Inches], optional): The width of the image. Defaults to None.
+            height (Optional[Inches], optional): The height of the image. Defaults to None.
+            move_to_background (bool, optional): If True, moves the image to the background. Defaults to True.
+
+        Returns:
+            Picture: The added picture object.
         """
         background_img = slide.shapes.add_picture(image_file, left, top, width, height)
         if move_to_background:
@@ -75,45 +87,86 @@ class PowerPoint:
         return background_img
 
     @classmethod
-    def default_templates(cls, widescreen: bool | None = True) -> None:
-        """Create a power point slide presentation using default templates."""
-        prs = Presentation()
+    def default_templates(cls, save_path: str = "default_templates.pptx", widescreen: bool = True) -> None:
+        """Create a PowerPoint presentation using default templates.
+
+        Arguments:
+            save_path (str, optional): Path to save the default templates. Defaults to "default_templates.pptx".
+            widescreen (bool, optional): Whether to set the presentation to widescreen. Defaults to True.
+        """
+        ppt = cls()
 
         if widescreen:
-            prs.slide_width = cls.widescreen_width
-            prs.slide_height = cls.widescreen_height
+            ppt.prs.slide_width = cls.widescreen_width
+            ppt.prs.slide_height = cls.widescreen_height
 
-        for layout_index in range(len(prs.slide_layouts)):
-            cls.add_slide(layout_index)
+        for layout_index in range(len(ppt.prs.slide_layouts)):
+            ppt.add_slide(layout_index)
 
-        prs.save("default_templates.pptx")
+        ppt.prs.save(save_path)
+        print(f"Default templates saved to {save_path}")
 
 
 @dataclass
 class Placeholder:
-    """A placeholder item inside of a slide."""
+    """Represents a placeholder item inside a slide.
+
+    Attributes:
+        slide (Slide): The slide containing the placeholder.
+        number (int): The placeholder index.
+    """
 
     slide: Slide
-    id: int
+    number: int
 
-    def add_bullets(self, bullets: list[tuple[str, int | None, int]]):
-        """Add list of bullets to the slide.
 
-        Each bullet is a tuple which consist of the text as a string, then an optional int for the bullet level, then another in for the font size.
-        """
-        requirement_body = self.slide.shapes.placeholders[self.id]
-        requirement_body_tf = requirement_body.text_frame
+@dataclass
+class Bullet:
+    """Represents a text bullet with optional bullet level and URL.
 
-        for bullet_text, bullet_level, font_size in bullets:
-            requirement_body_tf_p = requirement_body_tf.add_paragraph()
-            requirement_body_tf_p.text = bullet_text
-            requirement_body_tf_p.font.size = Pt(font_size)
-            if bullet_level is not None:
-                requirement_body_tf_p.level = bullet_level
+    Attributes:
+        text (str): The bullet text.
+        bullet_level (Optional[int]): The indentation level of the bullet.
+        font_size (int): The font size of the bullet text.
+        url (Optional[str]): An optional hyperlink for the bullet.
+    """
+
+    text: str
+    bullet_level: int | None = None
+    font_size: int = 14
+    url: str | None = None
+
+
+def create_bullets(container: Placeholder | TextFrame, bullets: list[Bullet]):
+    """Add bullets to a placeholder or text frame.
+
+    Arguments:
+        container (Union[Placeholder, TextFrame]): The container to add bullets to.
+        bullets (List[Bullet]): A list of Bullet instances to add.
+    """
+    if isinstance(container, Placeholder):
+        placeholder = container.slide.shapes.placeholders[container.number]
+        text_frame = placeholder.text_frame
+    else:
+        text_frame = container
+
+    for bullet in bullets:
+        paragraph = text_frame.add_paragraph()
+        if bullet.url:
+            paragraph = paragraph.add_run()
+            paragraph.text = bullet.text
+            paragraph.hyperlink.address = bullet.url
+        else:
+            paragraph.text = bullet.text
+        paragraph.font.size = Pt(bullet.font_size)
+        if bullet.bullet_level is not None:
+            paragraph.level = bullet.bullet_level
 
 
 class TitleSlide(SQLModel, table=True):
     """Represents the title slide of a presentation."""
+
+    __tablename__ = "title_slide"
 
     id: int | None = Field(default=None, primary_key=True)
     title: str = Field(index=True)
@@ -123,12 +176,19 @@ class TitleSlide(SQLModel, table=True):
     logo: str | None = Field(default=None)
 
     def create(self, ppt: PowerPoint) -> Slide:
-        """Create a title slide."""
-        slide = ppt.add_slide(0, self.title)
+        """Create a title slide in the PowerPoint presentation.
+
+        Arguments:
+            ppt (PowerPoint): The PowerPoint presentation object.
+
+        Returns:
+            Slide: The created title slide.
+        """
+        slide = ppt.add_slide(layout_index=0, title_text=self.title)
         if self.background_image:
-            ppt.add_background_image(
-                slide,
-                self.background_image,
+            PowerPoint.add_background_image(
+                slide=slide,
+                image_file=self.background_image,
                 width=PowerPoint.widescreen_width,
                 height=Inches(7),
             )
@@ -138,8 +198,8 @@ class TitleSlide(SQLModel, table=True):
             subtitle.text_frame.paragraphs[0].font.italic = True
             subtitle.text_frame.paragraphs[0].font.color.rbg = RGBColor(255, 0, 0)
         if self.date:
-            date = slide.shapes.add_textbox(left=Inches(0.5), top=Inches(7.1), width=Inches(1), height=Inches(0.3))
-            date_tf = date.text_frame
+            date_box = slide.shapes.add_textbox(left=Inches(0.5), top=Inches(7.1), width=Inches(1), height=Inches(0.3))
+            date_tf = date_box.text_frame
             date_tf.text = self.date
             date_p = date_tf.paragraphs[0]
             date_run = date_p.runs[0]
