@@ -1,5 +1,6 @@
 """Power point interface."""
 
+import re
 from bacore.domain.measurements import Time
 from dataclasses import dataclass
 from pptx import Presentation
@@ -8,11 +9,255 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.shapes.picture import Picture
 from pptx.slide import Slide
 from pptx.text.text import TextFrame
-from pptx.util import Inches, Length, Pt
-from sqlmodel import Field, SQLModel
-from typing import ClassVar
+from pptx.util import Cm, Emu, Inches, Length, Mm, Pt
+from sqlmodel import Field, Relationship, SQLModel
+from typing import ClassVar, Optional
 
 TODAY = Time().today_s
+
+
+def match_length_type_to_class(length_type_name: str) -> Length:
+    match length_type_name:
+        case "Cm":
+            length_class = Cm
+        case "Emu":
+            length_class = Emu
+        case "Inches":
+            length_class = Inches
+        case "Mm":
+            length_class = Mm
+        case "Pt":
+            length_class = Pt
+        case _:
+            length_class = Inches
+
+    return length_class
+
+
+class PresentationSlideLink(SQLModel, table=True):
+    presentation_id: int | None = Field(None, foreign_key="presentation.id", primary_key=True)
+    slide_id: int | None = Field(None, foreign_key="slide.id", primary_key=True)
+
+
+class SlideImageLink(SQLModel, table=True):
+    slide_id: int | None = Field(None, foreign_key="slide.id", primary_key=True)
+    image_id: int | None = Field(None, foreign_key="image.id", primary_key=True)
+
+
+class SText(SQLModel, table=True):
+    """SQLModel and representation a text bullet with optional bullet level and URL.
+
+    Attributes:
+        text (str): The bullet text.
+        bullet_level (Optional[int]): The indentation level of the bullet.
+        font_size (int): The font size of the bullet text.
+        url (Optional[str]): An optional hyperlink for the bullet.
+    """
+
+    __tablename__ = "text"
+
+    id: int | None = Field(None, primary_key=True)
+    content: str
+    font_size: int = Field(default=14)
+    bullet_level: int | None = Field(None)
+    url: str | None = Field(default=None)
+    textframe_id: int | None = Field(default=None, foreign_key="textframe.id")
+    textframe: Optional["STextFrame"] = Relationship(back_populates="texts")
+
+    def create(self, text_frame: TextFrame):
+        paragraph = text_frame.add_paragraph()
+
+        if self.url:
+            run = paragraph.add_run()
+            run.text = self.content
+            run.hyperlink.address = self.url
+            run.font.size = Pt(self.font_size)
+        else:
+            paragraph.text = self.content
+            paragraph.font.size = Pt(self.font_size)
+
+        if self.bullet_level:
+            paragraph.level = self.bullet_level
+
+
+class STextFrame(SQLModel, table=True):
+    """SQLModel and representation of a text frame object."""
+
+    __tablename__ = "textframe"
+
+    id: int | None = Field(None, primary_key=True)
+    placeholder_number: int | None = Field(default=None)
+    length_type: str = Field(default="Inches")
+    offset_left: float | None = Field(default=None)
+    offset_top: float | None = Field(default=None)
+    width: float | None = Field(default=None)
+    height: float | None = Field(default=None)
+    texts: list[SText] | None = Relationship(back_populates="textframe")
+    slide_id: int | None = Field(default=None, foreign_key="slide.id")
+    slide: Optional["SSlide"] = Relationship(back_populates="textframes")
+
+    def create(self, slide: Slide) -> TextFrame:
+        if self.placeholder_number:
+            placeholder = slide.shapes.placeholders[self.placeholder_number]
+            textframe = placeholder.text_frame
+        else:
+            length_class = match_length_type_to_class(length_type_name=self.length_type)
+            text_box = slide.shapes.add_textbox(
+                left=length_class(self.offset_left) if self.offset_left else 0,
+                top=length_class(self.offset_top) if self.offset_top else 0,
+                width=length_class(self.width) if self.width else 0,
+                height=length_class(self.height) if self.height else 0,
+            )
+            textframe = text_box.text_frame
+
+        for text in self.texts:
+            text.create(text_frame=textframe)
+
+        return textframe
+
+
+class SImage(SQLModel, table=True):
+    """SQLModel and representation of an image.
+
+    Attributes:
+        image: Path to the image file.
+        left: The left position of the image. Defaults to Inches(0).
+        top: The top position of the image. Defaults to Inches(0).
+        width: The width of the image. Defaults to None.
+        height: The height of the image. Defaults to None.
+        move_to_background: If True, moves the image to the background. Defaults to True.
+    """
+
+    __tablename__ = "image"
+
+    id: int | None = Field(None, primary_key=True)
+    path: str
+    length_type: str = Field(default="Inches")
+    offset_left: float | None = Field(default=None)
+    offset_top: float | None = Field(default=None)
+    width: float | None = Field(default=None)
+    height: float | None = Field(default=None)
+    push_to_layer: int | None = Field(default=None)
+    slides: list["SSlide"] | None = Relationship(back_populates="images", link_model=SlideImageLink)
+
+    def add_to_slide(self, slide: Slide) -> Picture:
+        """Add image to a slide.
+
+        Returns:
+            Picture: The added picture object.
+        """
+        length_class = match_length_type_to_class(length_type_name=self.length_type)
+
+        img = slide.shapes.add_picture(
+            image_file=self.path,
+            left=length_class(self.offset_left) if self.offset_left else 0,
+            top=length_class(self.offset_top) if self.offset_top else 0,
+            width=length_class(self.width) if self.width else None,
+            height=length_class(self.height) if self.height else None,
+        )
+
+        if self.push_to_layer:
+            slide.shapes._spTree.remove(img._element)
+            slide.shapes._spTree.insert(self.push_to_layer, img._element)
+
+        return img
+
+
+class SSlide(SQLModel, table=True):
+    __tablename__ = "slide"
+
+    id: int | None = Field(None, primary_key=True)
+    layout_index: int
+    title: str | None = Field(None, index=True)
+    sub_title: str | None = Field(None)
+    date: str | None = Field(default=None)
+    images: list[SImage] | None = Relationship(back_populates="slides", link_model=SlideImageLink)
+    textframes: list[STextFrame] | None = Relationship(back_populates="slide")
+    presentations: list["SPresentation"] | None = Relationship(
+        back_populates="slides", link_model=PresentationSlideLink
+    )
+
+    def create(self, prs: Presentation) -> Slide:
+        if self.layout_index < 0 or self.layout_index >= len(prs.slide_layouts):
+            raise ValueError(f"Layout index '{self.layout_index}' out of range.")
+
+        slide_layout = prs.slide_layouts[self.layout_index]
+        slide = prs.slides.add_slide(slide_layout)
+
+        if self.title and slide.shapes.title:
+            title = slide.shapes.title
+            title.text = self.title
+
+        if self.sub_title:
+            subtitle = slide.shapes.placeholders[1]
+            subtitle.text = self.sub_title
+            subtitle.text_frame.paragraphs[0].font.italic = True
+            subtitle.text_frame.paragraphs[0].font.color.rbg = RGBColor(255, 0, 0)
+
+        if self.date:
+            date_box = slide.shapes.add_textbox(left=Inches(0.5), top=Inches(7.1), width=Inches(1), height=Inches(0.3))
+            date_tf = date_box.text_frame
+            date_tf.text = self.date
+            date_p = date_tf.paragraphs[0]
+            date_run = date_p.runs[0]
+            date_run.font.size = Pt(12)
+            date_run.font.italic = True
+            date_p.alignment = PP_ALIGN.CENTER
+            date_tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+
+        for image in self.images:
+            image.add_to_slide(slide=slide)
+
+        for textframe in self.textframes:
+            textframe.create(slide=slide)
+
+        return slide
+
+
+class SPresentation(SQLModel, table=True):
+    """
+    Attributes:
+        prs (Presentation): The PowerPoint presentation object.
+        background_layer: Layer index for background elements.
+        widescreen_width: Width for widescreen presentations.
+        widescreen_height: Height for widescreen presentations.
+    """
+
+    __tablename__ = "presentation"
+
+    id: int | None = Field(None, primary_key=True)
+    name: str = Field(index=True)
+    output_dir: str | None = Field(None)
+    slides: list[SSlide] | None = Relationship(back_populates="presentations", link_model=PresentationSlideLink)
+
+    def create(
+        self,
+        file_name: str | None = None,
+        width: Length | None = None,
+        height: Length | None = None,
+    ) -> Presentation:
+        """Create the presentation."""
+        widescreen_width = Inches(13.33)
+        widescreen_height = Inches(7.5)
+
+        prs = Presentation()
+
+        if width or height:
+            prs.slide_width = width
+            prs.slide_height = height
+        else:
+            prs.slide_width = widescreen_width
+            prs.slide_height = widescreen_height
+
+        for slide in self.slides:
+            slide.create(prs=prs)
+
+        if not file_name:
+            clean_name = re.sub(r"[^\x00-\x7F]+", "_", self.name)  # replace any non-ASCII character
+            clean_name = clean_name.replace("-", "_").replace(" ", "_")
+            file_name = f"{clean_name.lower()}.pptx"
+
+        prs.save(f"{self.output_dir}/{file_name}")
 
 
 @dataclass

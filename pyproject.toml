@@ -48,6 +48,8 @@ dev = [
     "pytest-watch>=4.2.0",
     "python-language-server[all]>=0.36.2",
     "ruff>=0.5.2" ]
+devonthink = [
+    "pydt3>=0.1.0" ]
 ppt = [ "python-pptx>=1.0.2" ]
 web = [
     "python-fasthtml>=0.6.4" ]
