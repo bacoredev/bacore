@@ -1,4 +1,5 @@
 """Test data generation."""
+
 from dataclasses import dataclass
 from faker import Faker
 from hypothesis import strategies as st
@@ -17,25 +18,25 @@ class CountryCodes:
         ['da_DK', 'fi_FI', 'no_NO', 'sv_SE']
     """
 
-    china = 'zh_CN'
-    denmark = 'da_DK'
-    estonia = 'et_EE'
-    finland = 'fi_FI'
-    france = 'fr_FR'
-    germany = 'de_DE'
-    italy = 'it_IT'
-    latvia = 'lv_LV'
-    lithuania = 'lt_LT'
-    netherlands = 'nl_NL'
-    norway = 'no_NO'
-    poland = 'pl_PL'
-    portugal = 'pt_PT'
-    russia = 'ru_RU'
-    spain = 'es_ES'
-    sweden = 'sv_SE'
-    ukraine = 'uk_UA'
-    united_kingdom = 'en_GB'
-    united_states_of_america = 'en_US'
+    china = "zh_CN"
+    denmark = "da_DK"
+    estonia = "et_EE"
+    finland = "fi_FI"
+    france = "fr_FR"
+    germany = "de_DE"
+    italy = "it_IT"
+    latvia = "lv_LV"
+    lithuania = "lt_LT"
+    netherlands = "nl_NL"
+    norway = "no_NO"
+    poland = "pl_PL"
+    portugal = "pt_PT"
+    russia = "ru_RU"
+    spain = "es_ES"
+    sweden = "sv_SE"
+    ukraine = "uk_UA"
+    united_kingdom = "en_GB"
+    united_states_of_america = "en_US"
 
     @classmethod
     def nordics(cls) -> list[str]:
@@ -44,18 +45,24 @@ class CountryCodes:
     @classmethod
     def europe(cls) -> list[str]:
         countries = cls.nordics() + [
-            cls.estonia, cls.latvia, cls.lithuania,
-            cls.france, cls.germany, cls.italy,
-            cls.netherlands, cls.poland, cls.portugal,
-            cls.spain, cls.ukraine, cls.united_kingdom
+            cls.estonia,
+            cls.latvia,
+            cls.lithuania,
+            cls.france,
+            cls.germany,
+            cls.italy,
+            cls.netherlands,
+            cls.poland,
+            cls.portugal,
+            cls.spain,
+            cls.ukraine,
+            cls.united_kingdom,
         ]
         return sorted(countries)
 
     @classmethod
     def world(cls) -> list[str]:
-        countries = cls.europe() + [
-            cls.china, cls.russia, cls.united_states_of_america
-        ]
+        countries = cls.europe() + [cls.china, cls.russia, cls.united_states_of_america]
         return sorted(countries)
 
     @classmethod
@@ -78,13 +85,14 @@ class CountryCodes:
 @dataclass
 class PytestRunData:
     """Test result."""
+
     pytest_exit_codes = {
         0: "All tests were collected and passed successfully.",
         1: "Tests were collected and run but some of the tests failed.",
         2: "Test execution was interrupted by the user.",
         3: "Internal error happened while executing tests.",
         4: "pytest command line usage error.",
-        5: "No tests were collected."
+        5: "No tests were collected.",
     }
     status: int
     testrun_parameters: Optional[str] = None
@@ -123,33 +131,65 @@ class TestData:
             `False` and if `True` will data generation be slower.
 
     Examples:
-        >>> company = TestData(country_or_region="sweden").company()
-        >>> isinstance(company, st.SearchStrategy)
+        >>> company_st = TestData(country_or_region="sweden").company_st()
+        >>> isinstance(company_st, st.SearchStrategy)
         True
     """
 
     def __init__(self, country_or_region: str, match_real_world_occurrences: bool = False):
         self.country_or_region = country_or_region
-        self.faker_data = FakerData(self.country_or_region, match_real_world_occurrences=match_real_world_occurrences)
+        self.faker_data = FakerData(
+            self.country_or_region,
+            match_real_world_occurrences=match_real_world_occurrences,
+        )
 
-    def company(self) -> st.SearchStrategy:
+    def company(self) -> str:
+        """Return a single fake company name without using Hypothesis."""
+        return self.faker_data.company()
+
+    def company_st(self) -> st.SearchStrategy:
+        """Hypothesis strategy for generating company names."""
         return st.builds(self.faker_data.company)
 
-    def currency_code(self) -> st.SearchStrategy:
+    def currency_code(self) -> str:
+        """Return a single fake currency code."""
+        return self.faker_data.currency_code()
+
+    def currency_code_st(self) -> st.SearchStrategy:
+        """Hypothesis strategy for generating currency codes."""
         return st.builds(self.faker_data.currency_code)
 
-    def first_name(self) -> st.SearchStrategy:
+    def first_name(self) -> str:
+        """Return a single fake first name."""
+        return self.faker_data.first_name()
+
+    def first_name_st(self) -> st.SearchStrategy:
+        """Hypothesis strategy for generating first names."""
         return st.builds(self.faker_data.first_name)
 
-    def isin(self) -> st.SearchStrategy:
-        regex_map = {
-            "sweden": r"\ASE[0-9]{10}\Z",
-            "finland": r"\AFI[0-9]{10}\Z"
-        }
+    def isin(self) -> str:
+        """Return a single ISIN-like string based on the locale."""
+        regex_map = {"sweden": "SE##########", "finland": "FI##########"}
+        pattern = regex_map.get(self.country_or_region, "XX##########")
+        return self.faker_data.numerify(text=pattern)
+
+    def isin_st(self) -> st.SearchStrategy:
+        """Hypothesis strategy for generating isin numbers."""
+        regex_map = {"sweden": r"\ASE[0-9]{10}\Z", "finland": r"\AFI[0-9]{10}\Z"}
         return st.from_regex(regex_map.get(self.country_or_region, r"\A[X]{2}[A-Z0-9]{9}[0-9]\Z"))
 
-    def last_name(self) -> st.SearchStrategy:
+    def last_name(self) -> str:
+        """Return a single fake last name."""
+        return self.faker_data.last_name()
+
+    def last_name_st(self) -> st.SearchStrategy:
+        """Hypothesis strategy for generating isin last names."""
         return st.builds(self.faker_data.last_name)
 
-    def ssn(self) -> st.SearchStrategy:
+    def ssn(self) -> str:
+        """Return a single fake SSN."""
+        return self.faker_data.ssn()
+
+    def ssn_st(self) -> st.SearchStrategy:
+        """Hypothesis strategy for generating social security numbers."""
         return st.builds(self.faker_data.ssn)
